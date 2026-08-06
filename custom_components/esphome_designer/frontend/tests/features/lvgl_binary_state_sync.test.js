@@ -66,6 +66,19 @@ describe('LVGL binary state sync export', () => {
         }]);
     });
 
+    it('uses lock and unlock services for lock entities', () => {
+        const output = switchPlugin.exportLVGL({
+            id: 'lock_1',
+            type: 'lvgl_switch',
+            entity_id: 'lock.front_door',
+            props: { ...switchPlugin.defaults }
+        }, lvglContext);
+
+        const action = output.switch.on_value[0].if.then[0].if;
+        expect(action.then[0]['homeassistant.service'].service).toBe('lock.lock');
+        expect(action.else[0]['homeassistant.service'].service).toBe('lock.unlock');
+    });
+
     it('guards the checkbox toggle against state-sync feedback loops', () => {
         const output = checkboxPlugin.exportLVGL({
             id: 'cb_1',

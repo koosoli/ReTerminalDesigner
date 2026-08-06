@@ -1,3 +1,15 @@
+## v1.0.0 RC38 - Editor Visibility, Drag, Lock, and C++ Output Controls
+**Release Date:** August 6, 2026
+
+### Features
+- **Conditional Widget Editing (Issue #465):** Editor Preferences now includes “Show conditionally hidden widgets.” Widgets hidden by their current visibility condition can be selected and edited on the canvas with a distinct dashed outline, without changing their runtime condition.
+- **Drag Source Outline (Issue #466):** Widgets now retain a visible dashed outline while being dragged, making freeform positioning easier without grid snapping.
+- **LVGL Lock Control (Issue #468):** The LVGL Switch control now supports `lock.*` entities. It reflects the current lock state and calls `lock.lock` or `lock.unlock` as appropriate.
+- **C/C++ Comment Toggle (Issue #474):** Editor Preferences now includes a C/C++ Output “Include comments” option. Disabling it produces compact C/C++ drawing output without generated comments; ESPHome YAML continues to retain its round-trip metadata by default.
+- **Release Metadata Refresh:** Updated package metadata, Home Assistant manifest version, visible header label, release notes, and rebuilt frontend assets for RC38.
+
+---
+
 ## v1.0.0 RC37 - Home Assistant 2026.8 Panel Layout Fix
 **Release Date:** August 6, 2026
 

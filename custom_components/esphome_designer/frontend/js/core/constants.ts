@@ -72,6 +72,7 @@ export const ORIENTATIONS = {
 export const DEFAULT_PREFERENCES = {
     snapEnabled: true,
     showGrid: true,
+    showConditionalWidgets: false,
     showDebugGrid: false,
     showRulers: false,
     autoSaveEnabled: true,
@@ -104,6 +105,7 @@ export const DEFAULT_PREFERENCES = {
     noRefreshStartHour: null,
     noRefreshEndHour: null,
     renderingMode: "direct" as "direct" | "lvgl" | "c" | "oepl" | "opendisplay",
+    c_include_comments: true,
     oeplEntityId: "",
     oeplDither: 2,
     opendisplayDeviceId: "",

@@ -11,6 +11,7 @@ tmp/proof/
 *.swp
 *.swo
 /.agent
+/.grok/
 
 # OS artifacts
 .DS_Store

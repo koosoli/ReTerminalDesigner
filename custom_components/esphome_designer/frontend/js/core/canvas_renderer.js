@@ -252,7 +252,8 @@ export function render(canvasInstance) {
 
         // Render widgets
         for (const widget of page.widgets) {
-            if (!isWidgetVisibleInPreview(widget, AppState.entityStates || {})) continue;
+            const conditionallyHidden = !isWidgetVisibleInPreview(widget, AppState.entityStates || {});
+            if (conditionallyHidden && !AppState.settings.showConditionalWidgets) continue;
 
             /** @type {HTMLElement} */
             const el = document.createElement("div");
@@ -269,6 +270,7 @@ export function render(canvasInstance) {
             }
             if (widget.locked) el.classList.add("locked");
             if (widget.hidden) el.classList.add("hidden-widget");
+            if (conditionallyHidden) el.classList.add("conditional-hidden-widget");
 
             const type = (widget.type || "").toLowerCase();
             const feature = registry.get(type);

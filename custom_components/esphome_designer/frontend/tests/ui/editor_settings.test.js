@@ -21,6 +21,8 @@ const mockLogger = {
 const mockAppState = {
     settings: {
         editor_light_mode: false,
+        showConditionalWidgets: false,
+        c_include_comments: true,
         autoSaveEnabled: true,
         grid_opacity: 30,
         glyphsets: ['GF_Latin_Kernel'],
@@ -80,7 +82,9 @@ describe('EditorSettings', () => {
 
             <input id="editorSnapToGrid" type="checkbox" />
             <input id="editorShowGrid" type="checkbox" />
+            <input id="editorShowConditionalWidgets" type="checkbox" />
             <input id="editorLightMode" type="checkbox" />
+            <input id="editorCIncludeComments" type="checkbox" />
             <input id="editorAutoSave" type="checkbox" />
             <button id="editorRefreshEntities">Refresh</button>
             <div id="editorEntityCount"></div>
@@ -175,6 +179,16 @@ describe('EditorSettings', () => {
         light.dispatchEvent(new Event('change'));
         expect(mockAppState.updateSettings).toHaveBeenCalledWith({ editor_light_mode: true });
         expect(mockEmit).toHaveBeenCalled();
+
+        const showConditionalWidgets = document.getElementById('editorShowConditionalWidgets');
+        showConditionalWidgets.checked = true;
+        showConditionalWidgets.dispatchEvent(new Event('change'));
+        expect(mockAppState.updateSettings).toHaveBeenCalledWith({ showConditionalWidgets: true });
+
+        const cIncludeComments = document.getElementById('editorCIncludeComments');
+        cIncludeComments.checked = false;
+        cIncludeComments.dispatchEvent(new Event('change'));
+        expect(mockAppState.updateSettings).toHaveBeenCalledWith({ c_include_comments: false });
 
         const autoSave = document.getElementById('editorAutoSave');
         autoSave.checked = false;

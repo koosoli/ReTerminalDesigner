@@ -48,7 +48,9 @@ export class EditorSettings {
 
         this.snapToGrid = getInput('editorSnapToGrid');
         this.showGrid = getInput('editorShowGrid');
+        this.showConditionalWidgets = getInput('editorShowConditionalWidgets');
         this.lightMode = getInput('editorLightMode');
+        this.cIncludeComments = getInput('editorCIncludeComments');
         this.autoSave = getInput('editorAutoSave');
         this.refreshEntitiesBtn = getButton('editorRefreshEntities');
         this.entityCountLabel = getElement('editorEntityCount');
@@ -104,8 +106,16 @@ export class EditorSettings {
             this.showGrid.checked = AppState.showGrid !== false;
         }
 
+        if (this.showConditionalWidgets) {
+            this.showConditionalWidgets.checked = !!settings.showConditionalWidgets;
+        }
+
         if (this.lightMode) {
             this.lightMode.checked = !!settings.editor_light_mode;
+        }
+
+        if (this.cIncludeComments) {
+            this.cIncludeComments.checked = settings.c_include_comments !== false;
         }
 
         if (this.autoSave) {
@@ -204,6 +214,14 @@ export class EditorSettings {
             });
         }
 
+        const showConditionalWidgets = this.showConditionalWidgets;
+        if (showConditionalWidgets) {
+            showConditionalWidgets.addEventListener('change', () => {
+                AppState.updateSettings({ showConditionalWidgets: showConditionalWidgets.checked });
+                emit(EVENTS.STATE_CHANGED);
+            });
+        }
+
         const lightMode = this.lightMode;
         if (lightMode) {
             lightMode.addEventListener('change', () => {
@@ -211,6 +229,13 @@ export class EditorSettings {
                 AppState.updateSettings({ editor_light_mode: isLight });
                 this.applyEditorTheme(isLight);
                 emit(EVENTS.STATE_CHANGED);
+            });
+        }
+
+        const cIncludeComments = this.cIncludeComments;
+        if (cIncludeComments) {
+            cIncludeComments.addEventListener('change', () => {
+                AppState.updateSettings({ c_include_comments: cIncludeComments.checked });
             });
         }
 

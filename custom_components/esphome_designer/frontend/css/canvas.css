@@ -336,6 +336,13 @@
     pointer-events: none;
 }
 
+.widget.conditional-hidden-widget {
+    opacity: 0.4 !important;
+    filter: grayscale(0.8);
+    outline: 2px dashed var(--warning);
+    outline-offset: 2px;
+}
+
 .widget.active {
     outline: none;
     box-shadow: 0 0 0 2px var(--accent);

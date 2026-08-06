@@ -9,7 +9,13 @@ const buildLoopGuardedToggleAction = (entityId) => ({
         condition: {
             lambda: `return x != id(${makeSafeId(entityId)}).state;`
         },
-        then: [{ "homeassistant.service": { service: "homeassistant.toggle", data: { entity_id: entityId } } }]
+        then: entityId.startsWith('lock.')
+            ? [{ if: {
+                condition: { lambda: 'return x;' },
+                then: [{ "homeassistant.service": { service: "lock.lock", data: { entity_id: entityId } } }],
+                else: [{ "homeassistant.service": { service: "lock.unlock", data: { entity_id: entityId } } }]
+            } }]
+            : [{ "homeassistant.service": { service: "homeassistant.toggle", data: { entity_id: entityId } } }]
     }
 });
 
@@ -107,7 +113,7 @@ const onExportBinarySensors = (context) => {
 
 export default {
     id: "lvgl_switch",
-    name: "Switch",
+    name: "Switch / Lock",
     category: "LVGL",
     supportedModes: ['lvgl'],
     defaults: {

@@ -348,6 +348,31 @@ describe('canvas_renderer core', () => {
         })).toBe(true);
     });
 
+    it('renders conditionally hidden widgets in edit mode with a distinct outline', () => {
+        mockAppState.pages = [{
+            name: 'Overview',
+            widgets: [{
+                id: 'conditional_1',
+                type: 'text',
+                x: 10,
+                y: 10,
+                width: 80,
+                height: 20,
+                condition_entity: 'binary_sensor.door',
+                condition_state: 'on',
+                props: {}
+            }]
+        }];
+        mockAppState.entityStates = { 'binary_sensor.door': { state: 'off' } };
+        mockAppState.settings.showConditionalWidgets = true;
+        mockRegistry.get.mockReturnValue({ render: mockFeatureRender });
+
+        const canvas = document.createElement('div');
+        render({ canvas, viewport: document.createElement('div'), app: {} });
+
+        expect(canvas.querySelector('.widget[data-id="conditional_1"]')?.classList.contains('conditional-hidden-widget')).toBe(true);
+    });
+
     it('wires header action buttons to page operations', () => {
         mockAppState.pages = [
             { name: 'Page One', widgets: [] },

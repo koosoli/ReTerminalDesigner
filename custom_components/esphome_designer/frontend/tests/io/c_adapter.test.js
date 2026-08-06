@@ -99,6 +99,40 @@ describe('CAdapter', () => {
         expect(mockRegistry.onCollectRequirements).not.toHaveBeenCalled();
     });
 
+    it('omits generated comments when configured', async () => {
+        const adapter = new CAdapter();
+        const output = await adapter.generate({
+            c_include_comments: false,
+            currentPageIndex: 0,
+            pages: [{
+                name: 'Main',
+                widgets: [{ id: 'text_1', type: 'text', x: 10, y: 20, width: 100, height: 20, props: { text: 'Hello' } }]
+            }]
+        });
+
+        expect(output).toContain('int currentPage = 0;');
+        expect(output).toContain('it.print(10, 20, id(font_roboto_400_16), COLOR_BLACK, "Hello");');
+        expect(output).not.toContain('//');
+        expect(output).not.toContain('/*');
+    });
+
+    it('keeps comment-like text inside C++ string literals', async () => {
+        mockRegistry.get.mockReturnValueOnce({
+            export: (_widget, context) => context.lines.push('it.print(10, 20, id(font_roboto_400_16), COLOR_BLACK, "https://example.test");')
+        });
+
+        const adapter = new CAdapter();
+        const output = await adapter.generate({
+            c_include_comments: false,
+            pages: [{
+                name: 'Main',
+                widgets: [{ id: 'text_1', type: 'text', x: 10, y: 20, width: 100, height: 20, props: {} }]
+            }]
+        });
+
+        expect(output).toContain('"https://example.test"');
+    });
+
     it('is selected by the rendering mode factory', () => {
         const adapter = createAdapterForMode('c');
 

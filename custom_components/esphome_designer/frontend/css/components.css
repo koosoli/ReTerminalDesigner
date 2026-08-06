@@ -1328,6 +1328,8 @@ kbd {
 
 /* Source widget fades during drag */
 .widget.dragging-source {
-    opacity: 0.3 !important;
+    opacity: 0.55 !important;
+    outline: 2px dashed var(--accent);
+    outline-offset: 2px;
     pointer-events: none !important;
 }
