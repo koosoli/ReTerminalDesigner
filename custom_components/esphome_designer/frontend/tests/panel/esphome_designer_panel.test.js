@@ -29,6 +29,9 @@ describe('esphome-designer-panel', () => {
         const iframe = /** @type {HTMLIFrameElement | null} */ (el.querySelector('iframe'));
         expect(iframe).not.toBeNull();
         expect(iframe?.src).toContain('/esphome-designer/editor/index.html');
+        expect(el.style.height).toBe('100dvh');
+        expect(el.style.minHeight).toBe('0');
+        expect(iframe?.style.height).toBe('100%');
 
         const payload = JSON.parse(iframe?.name || '{}');
         expect(payload).toEqual({

@@ -136,7 +136,10 @@ export class ESPHomeDesignerPanel extends HTMLElement {
 
     _applyHostStyles() {
         this.style.display = 'block';
-        this.style.height = '100%';
+        // HA 2026.8 no longer supplies custom panels with a definite height.
+        // A definite height is also required for the iframe's percentage height.
+        this.style.height = '100vh';
+        this.style.height = '100dvh';
         this.style.minHeight = '0';
         this.style.overflow = 'hidden';
     }

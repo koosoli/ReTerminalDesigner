@@ -1,3 +1,12 @@
+## v1.0.0 RC37 - Home Assistant 2026.8 Panel Layout Fix
+**Release Date:** August 6, 2026
+
+### Fixes
+- **Home Assistant 2026.8 Panel Height (Issues #472 and #475):** The custom panel host now has an explicit viewport height (`100vh` with a `100dvh` override). This prevents the iframe and designer layout from collapsing when Home Assistant no longer gives custom panels an implicit height.
+- **Release Metadata Refresh:** Updated package metadata, Home Assistant manifest version, visible header label, release notes, and rebuilt frontend assets for RC37.
+
+---
+
 ## v1.0.0 RC36 - Sensor Text and E1003 Hardware Completion
 **Release Date:** July 21, 2026
 

@@ -1,10 +1,10 @@
 {
-  "_app-shell-TJbISEXr.js": {
-    "file": "assets/app-shell-TJbISEXr.js",
+  "_app-shell-C_lsfiId.js": {
+    "file": "assets/app-shell-C_lsfiId.js",
     "name": "app-shell",
     "imports": [
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ],
     "dynamicImports": [
       "features/battery_icon/plugin.js",
@@ -71,19 +71,19 @@
       "assets/logo_header-CUGdaeC6.png"
     ]
   },
-  "_deferred-ui-CfLARqcR.js": {
-    "file": "assets/deferred-ui-CfLARqcR.js",
+  "_deferred-ui-EUNgeGK_.js": {
+    "file": "assets/deferred-ui-EUNgeGK_.js",
     "name": "deferred-ui",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js"
+      "_app-shell-C_lsfiId.js"
     ]
   },
-  "_fillable_shape-BnkIsbJQ.js": {
-    "file": "assets/fillable_shape-BnkIsbJQ.js",
+  "_fillable_shape-DlTEWV0w.js": {
+    "file": "assets/fillable_shape-DlTEWV0w.js",
     "name": "fillable_shape",
     "imports": [
-      "_app-shell-TJbISEXr.js"
+      "_app-shell-C_lsfiId.js"
     ]
   },
   "_ignorable_rejections-Dp_n9Kdf.js": {
@@ -111,11 +111,11 @@
     "file": "assets/vendor-Bi4LEBGV.js",
     "name": "vendor"
   },
-  "_yaml-engine-CilTlMHC.js": {
-    "file": "assets/yaml-engine-CilTlMHC.js",
+  "_yaml-engine-DrS8WZs8.js": {
+    "file": "assets/yaml-engine-DrS8WZs8.js",
     "name": "yaml-engine",
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
@@ -128,35 +128,35 @@
     "src": "assets/logo_header.png"
   },
   "features/battery_icon/plugin.js": {
-    "file": "assets/plugin-BrHryU4Q.js",
+    "file": "assets/plugin-By2Ojcy5.js",
     "name": "plugin",
     "src": "features/battery_icon/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/calendar/plugin.js": {
-    "file": "assets/plugin-C101rWdR.js",
+    "file": "assets/plugin-DX99X3n5.js",
     "name": "plugin",
     "src": "features/calendar/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/datetime/plugin.js": {
-    "file": "assets/plugin-BAb8k6SB.js",
+    "file": "assets/plugin-DkLLoYZQ.js",
     "name": "plugin",
     "src": "features/datetime/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
-      "_yaml-engine-CilTlMHC.js",
+      "_app-shell-C_lsfiId.js",
+      "_yaml-engine-DrS8WZs8.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
@@ -167,49 +167,49 @@
     "isDynamicEntry": true
   },
   "features/energy_widget/plugin.js": {
-    "file": "assets/plugin-KqhK9alL.js",
+    "file": "assets/plugin-CmpVIhML.js",
     "name": "plugin",
     "src": "features/energy_widget/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/graph/plugin.js": {
-    "file": "assets/plugin-DLPvup4t.js",
+    "file": "assets/plugin-Db2URCCP.js",
     "name": "plugin",
     "src": "features/graph/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
-      "_yaml-engine-CilTlMHC.js",
+      "_app-shell-C_lsfiId.js",
+      "_yaml-engine-DrS8WZs8.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
   "features/icon/plugin.js": {
-    "file": "assets/plugin-CKNNxC1H.js",
+    "file": "assets/plugin-Dz4S583u.js",
     "name": "plugin",
     "src": "features/icon/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_mdi-icons-CTSt1Fdj.js",
       "_text_utils-DPZlj6Oi.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/image/plugin.js": {
-    "file": "assets/plugin-COZBcYG0.js",
+    "file": "assets/plugin-CGMtSnOx.js",
     "name": "plugin",
     "src": "features/image/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/line/plugin.js": {
@@ -219,14 +219,14 @@
     "isDynamicEntry": true
   },
   "features/lvgl_arc/plugin.js": {
-    "file": "assets/plugin-CJS7SSPp.js",
+    "file": "assets/plugin-BjHSyufo.js",
     "name": "plugin",
     "src": "features/lvgl_arc/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/lvgl_bar/plugin.js": {
@@ -236,13 +236,13 @@
     "isDynamicEntry": true
   },
   "features/lvgl_button/plugin.js": {
-    "file": "assets/plugin-TmeDgLWx.js",
+    "file": "assets/plugin-CpqncrTr.js",
     "name": "plugin",
     "src": "features/lvgl_button/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_yaml-engine-CilTlMHC.js",
-      "_app-shell-TJbISEXr.js",
+      "_yaml-engine-DrS8WZs8.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
@@ -259,13 +259,13 @@
     "isDynamicEntry": true
   },
   "features/lvgl_checkbox/plugin.js": {
-    "file": "assets/plugin-DOZSMm24.js",
+    "file": "assets/plugin-CrAWHBup.js",
     "name": "plugin",
     "src": "features/lvgl_checkbox/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_yaml-engine-CilTlMHC.js",
-      "_app-shell-TJbISEXr.js",
+      "_yaml-engine-DrS8WZs8.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
@@ -288,14 +288,14 @@
     "isDynamicEntry": true
   },
   "features/lvgl_label/plugin.js": {
-    "file": "assets/plugin-BHLdQ5bs.js",
+    "file": "assets/plugin-CidcCclB.js",
     "name": "plugin",
     "src": "features/lvgl_label/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/lvgl_led/plugin.js": {
@@ -353,13 +353,13 @@
     "isDynamicEntry": true
   },
   "features/lvgl_switch/plugin.js": {
-    "file": "assets/plugin-DW75oTkF.js",
+    "file": "assets/plugin-COeyxgj_.js",
     "name": "plugin",
     "src": "features/lvgl_switch/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_yaml-engine-CilTlMHC.js",
-      "_app-shell-TJbISEXr.js",
+      "_yaml-engine-DrS8WZs8.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
@@ -382,13 +382,13 @@
     "isDynamicEntry": true
   },
   "features/moon_phase/plugin.js": {
-    "file": "assets/plugin-OtVqjifp.js",
+    "file": "assets/plugin-CYX0r1AS.js",
     "name": "plugin",
     "src": "features/moon_phase/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
-      "_yaml-engine-CilTlMHC.js",
+      "_app-shell-C_lsfiId.js",
+      "_yaml-engine-DrS8WZs8.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
@@ -435,229 +435,229 @@
     "isDynamicEntry": true
   },
   "features/ondevice_humidity/plugin.js": {
-    "file": "assets/plugin-C2EJNwsy.js",
+    "file": "assets/plugin-Bs1vI85f.js",
     "name": "plugin",
     "src": "features/ondevice_humidity/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/ondevice_temperature/plugin.js": {
-    "file": "assets/plugin-BI32j_Az.js",
+    "file": "assets/plugin-BeZgwiaJ.js",
     "name": "plugin",
     "src": "features/ondevice_temperature/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/online_image/plugin.js": {
-    "file": "assets/plugin-Dmyq_QcP.js",
+    "file": "assets/plugin-DxFDRgWT.js",
     "name": "plugin",
     "src": "features/online_image/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/progress_bar/plugin.js": {
-    "file": "assets/plugin-elab1cME.js",
+    "file": "assets/plugin-B98C_MFx.js",
     "name": "plugin",
     "src": "features/progress_bar/plugin.js",
     "isDynamicEntry": true,
     "imports": [
       "_template_converter-xh6TZI7e.js",
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/qr_code/plugin.js": {
-    "file": "assets/plugin-BwXVS5pP.js",
+    "file": "assets/plugin-Dx3EgFG9.js",
     "name": "plugin",
     "src": "features/qr_code/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/quote_rss/plugin.js": {
-    "file": "assets/plugin-DeHFSPYB.js",
+    "file": "assets/plugin-CO3nW20m.js",
     "name": "plugin",
     "src": "features/quote_rss/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_yaml-engine-CilTlMHC.js",
-      "_app-shell-TJbISEXr.js",
+      "_yaml-engine-DrS8WZs8.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
   "features/rounded_rect/plugin.js": {
-    "file": "assets/plugin-Wjy4jvI5.js",
+    "file": "assets/plugin-DiCD55DG.js",
     "name": "plugin",
     "src": "features/rounded_rect/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_fillable_shape-BnkIsbJQ.js",
-      "_app-shell-TJbISEXr.js",
+      "_fillable_shape-DlTEWV0w.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/sensor_text/plugin.js": {
-    "file": "assets/plugin-D4hES5gI.js",
+    "file": "assets/plugin-BLDfdcyZ.js",
     "name": "plugin",
     "src": "features/sensor_text/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_text_utils-DPZlj6Oi.js",
       "_template_converter-xh6TZI7e.js",
-      "_yaml-engine-CilTlMHC.js",
+      "_yaml-engine-DrS8WZs8.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
   "features/shape_circle/plugin.js": {
-    "file": "assets/plugin-PdD5fmQ3.js",
+    "file": "assets/plugin-BdPty9V0.js",
     "name": "plugin",
     "src": "features/shape_circle/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_fillable_shape-BnkIsbJQ.js",
-      "_app-shell-TJbISEXr.js",
+      "_fillable_shape-DlTEWV0w.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/shape_rect/plugin.js": {
-    "file": "assets/plugin-Dv1d7n9X.js",
+    "file": "assets/plugin-CjbB10WU.js",
     "name": "plugin",
     "src": "features/shape_rect/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_fillable_shape-BnkIsbJQ.js",
-      "_app-shell-TJbISEXr.js",
+      "_fillable_shape-DlTEWV0w.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/sun_times/plugin.js": {
-    "file": "assets/plugin-Bux3Xon1.js",
+    "file": "assets/plugin-Cspyk6n1.js",
     "name": "plugin",
     "src": "features/sun_times/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
-      "_yaml-engine-CilTlMHC.js",
+      "_app-shell-C_lsfiId.js",
+      "_yaml-engine-DrS8WZs8.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
   "features/template_nav_bar/plugin.js": {
-    "file": "assets/plugin-CD2td55O.js",
+    "file": "assets/plugin-DJ9RPlLd.js",
     "name": "plugin",
     "src": "features/template_nav_bar/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_yaml-engine-CilTlMHC.js",
-      "_app-shell-TJbISEXr.js",
+      "_yaml-engine-DrS8WZs8.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
   "features/template_sensor_bar/plugin.js": {
-    "file": "assets/plugin-BiwOdujw.js",
+    "file": "assets/plugin-js_juhIl.js",
     "name": "plugin",
     "src": "features/template_sensor_bar/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/text/plugin.js": {
-    "file": "assets/plugin-CEUQQ7u0.js",
+    "file": "assets/plugin-Dj6VTwlu.js",
     "name": "plugin",
     "src": "features/text/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_text_utils-DPZlj6Oi.js",
-      "_yaml-engine-CilTlMHC.js",
+      "_yaml-engine-DrS8WZs8.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
   "features/touch_area/plugin.js": {
-    "file": "assets/plugin-HGCxf3wq.js",
+    "file": "assets/plugin-XYxrB6qm.js",
     "name": "plugin",
     "src": "features/touch_area/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_yaml-engine-CilTlMHC.js",
+      "_yaml-engine-DrS8WZs8.js",
       "_mdi-icons-CTSt1Fdj.js",
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
   "features/weather_forecast/plugin.js": {
-    "file": "assets/plugin-CFm-8erf.js",
+    "file": "assets/plugin-_E4CZoYL.js",
     "name": "plugin",
     "src": "features/weather_forecast/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_shared-CG-Iex5A.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "features/weather_icon/plugin.js": {
-    "file": "assets/plugin-Cj5zPq-P.js",
+    "file": "assets/plugin-Csj9_f5e.js",
     "name": "plugin",
     "src": "features/weather_icon/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_yaml-engine-CilTlMHC.js",
-      "_app-shell-TJbISEXr.js",
+      "_yaml-engine-DrS8WZs8.js",
+      "_app-shell-C_lsfiId.js",
       "_shared-CG-Iex5A.js",
       "_vendor-Bi4LEBGV.js"
     ]
   },
   "features/wifi_signal/plugin.js": {
-    "file": "assets/plugin-DAeBwlFA.js",
+    "file": "assets/plugin-D8-OtpX8.js",
     "name": "plugin",
     "src": "features/wifi_signal/plugin.js",
     "isDynamicEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_vendor-Bi4LEBGV.js",
-      "_yaml-engine-CilTlMHC.js"
+      "_yaml-engine-DrS8WZs8.js"
     ]
   },
   "index.html": {
-    "file": "assets/main-CdW_-d-g.js",
+    "file": "assets/main-B6tQDPSo.js",
     "name": "main",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_app-shell-TJbISEXr.js",
+      "_app-shell-C_lsfiId.js",
       "_ignorable_rejections-Dp_n9Kdf.js",
-      "_yaml-engine-CilTlMHC.js",
+      "_yaml-engine-DrS8WZs8.js",
       "_vendor-Bi4LEBGV.js"
     ],
     "dynamicImports": [
-      "_deferred-ui-CfLARqcR.js",
-      "_deferred-ui-CfLARqcR.js",
-      "_deferred-ui-CfLARqcR.js",
-      "_deferred-ui-CfLARqcR.js"
+      "_deferred-ui-EUNgeGK_.js",
+      "_deferred-ui-EUNgeGK_.js",
+      "_deferred-ui-EUNgeGK_.js",
+      "_deferred-ui-EUNgeGK_.js"
     ],
     "css": [
       "assets/main-h3BOJiFE.css"
@@ -672,7 +672,7 @@
     "src": "materialdesignicons-webfont.ttf"
   },
   "panel/esphome-designer-panel.js": {
-    "file": "assets/panel-xgsrzzPP.js",
+    "file": "assets/panel-wbhlJAgn.js",
     "name": "panel",
     "src": "panel/esphome-designer-panel.js",
     "isEntry": true,
