@@ -159,7 +159,7 @@ export function generateBinarySensorSection(profile, numPages, displayId = "my_d
                 return;
             }
 
-            const safeId = (widget.entity_id || `touch_area_${widget.id}`).replace(/[^a-zA-Z0-9_]/g, "_");
+            const safeId = `touch_area_${widget.id}`.replace(/[^a-zA-Z0-9_]/g, "_");
             const iconSize = parseInt(String(props.icon_size || 40), 10);
             const minWidth = Math.max(widget.width, iconSize);
             const minHeight = Math.max(widget.height, iconSize);
