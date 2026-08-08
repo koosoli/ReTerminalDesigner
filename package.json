@@ -47,6 +47,6 @@
     "vitest": "^1.4.0"
   },
   "dependencies": {
-    "js-yaml": "^4.1.1"
+    "js-yaml": "^4.3.1"
   }
 }
