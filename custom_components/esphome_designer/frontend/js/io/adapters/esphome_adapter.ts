@@ -199,7 +199,9 @@ export class ESPHomeAdapter extends BaseAdapter {
 
         try {
             const requestOptions: RequestInit = { cache: "no-store" };
-            const response = fetchUrl.startsWith('/api/esphome_designer/')
+            const isHaApiRequest = fetchUrl.startsWith('/api/esphome_designer/')
+                || (!!HA_API_BASE && fetchUrl.startsWith(`${HA_API_BASE}/`));
+            const response = isHaApiRequest
                 ? await haFetch(fetchUrl, {
                     ...requestOptions,
                     headers: getHaHeaders(),

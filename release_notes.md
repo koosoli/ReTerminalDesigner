@@ -1,3 +1,13 @@
+## v1.0.0 RC39 - Auth Fix and Unique Touch Area IDs
+**Release Date:** August 8, 2026
+
+### Fixes
+- **HTTP Ban Warnings on Hardware Fetch (Issue #480):** Fixed a regression from RC37 where hardware profile requests were sent without authentication whenever the detected Home Assistant API base was an absolute URL. The unauthenticated requests triggered repeated `homeassistant.components.http.ban` warnings and could eventually ban the client IP. Hardware package requests now always use the authenticated HA fetch path.
+- **Duplicate Touch Area IDs (Issue #477, PR #478):** Touch areas sharing the same Home Assistant entity no longer generate duplicate ESPHome `binary_sensor` IDs that broke compilation. Touch area IDs are now derived from the unique widget ID (thanks @hacsact).
+- **Release Metadata Refresh:** Updated package metadata, Home Assistant manifest version, visible header label, release notes, and rebuilt frontend assets for RC39.
+
+---
+
 ## v1.0.0 RC38 - Editor Visibility, Drag, Lock, and C++ Output Controls
 **Release Date:** August 6, 2026
 

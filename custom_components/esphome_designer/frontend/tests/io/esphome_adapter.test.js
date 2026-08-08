@@ -178,6 +178,30 @@ describe('ESPHomeAdapter', () => {
         );
     });
 
+    it('uses the authenticated HA fetch when HA_API_BASE is an absolute URL', async () => {
+        mockHaFetch.mockResolvedValue({
+            ok: true,
+            text: vi.fn().mockResolvedValue('package: test')
+        });
+        mockHasHaBackend.mockReturnValue(true);
+        mockHaApiBase.mockReturnValue('https://ha.example/api/esphome_designer');
+        Object.defineProperty(globalThis, 'location', {
+            configurable: true,
+            value: { pathname: '/' }
+        });
+
+        const result = await adapter.fetchHardwarePackage('hardware/demo.yaml');
+
+        expect(result).toBe('package: test');
+        expect(mockHaFetch).toHaveBeenCalledWith(
+            'https://ha.example/api/esphome_designer/hardware/package?path=hardware%2Fdemo.yaml',
+            {
+                cache: 'no-store',
+                headers: { Authorization: 'Bearer test-token' }
+            }
+        );
+    });
+
     it('returns an inline error snippet when hardware package fetch fails', async () => {
         vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('boom')));
         Object.defineProperty(globalThis, 'location', {
