@@ -97,7 +97,7 @@ const exportDoc = (w, context) => {
 
     if (icon) {
         const fontRef = addFont("Material Design Icons", 400, iconSize);
-        const safeId = (w.entity_id || `touch_area_${w.id.replace(/-/g, "_")}`).replace(/[^a-zA-Z0-9_]/g, "_");
+        const safeId = `touch_area_${w.id}`.replace(/[^a-zA-Z0-9_]/g, "_");
 
         if (iconPressed) {
             lines.push(`        if (id(${safeId}).state) {`);
@@ -127,7 +127,7 @@ const onExportBinarySensors = (context) => {
     lines.push("# Touch Area Binary Sensors");
     targets.forEach(w => {
         const p = w.props || {};
-        const safeId = (w.entity_id || `touch_area_${w.id.replace(/-/g, "_")}`).replace(/[^a-zA-Z0-9_]/g, "_");
+        const safeId = `touch_area_${w.id}`.replace(/[^a-zA-Z0-9_]/g, "_");
 
         lines.push(`- platform: touchscreen`);
         lines.push(`  id: ${safeId}`);

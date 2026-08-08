@@ -54,6 +54,17 @@ describe('hardware_generators_inputs', () => {
                 props: {
                     icon_size: 40
                 }
+            },
+            {
+                id: 'toggle_touch_duplicate',
+                type: 'touch_area',
+                entity_id: 'light.kitchen',
+                x: 180,
+                y: 20,
+                width: 20,
+                height: 20,
+                _pageIndex: 1,
+                props: {}
             }
         ]);
 
@@ -61,6 +72,9 @@ describe('hardware_generators_inputs', () => {
 
         expect(joined).toContain('id: button_left');
         expect(joined).toContain('id: button_right');
+        expect(joined).toContain('id: touch_area_toggle_touch');
+        expect(joined).toContain('id: touch_area_toggle_touch_duplicate');
+        expect(joined.match(/entity_id: light\.kitchen/g)).toHaveLength(2);
         expect(joined).toContain('id: button_enter');
         expect(joined).toContain('id: button_home');
         expect(joined).toContain('id: nav_prev_nav_main');
