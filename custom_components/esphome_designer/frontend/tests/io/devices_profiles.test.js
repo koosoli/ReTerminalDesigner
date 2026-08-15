@@ -215,6 +215,26 @@ describe('built-in device profiles', async () => {
         expect(devices.SUPPORTED_DEVICE_IDS).toContain('elecrow_esp32_p4_9inch_v1_2');
     });
 
+    it('includes the Seeed reTerminal D1001 P4 profile as an untested built-in', () => {
+        const profile = devices.DEVICE_PROFILES.seeedstudio_reterminal_d1001;
+
+        expect(profile).toMatchObject({
+            name: 'Seeed Studio reTerminal D1001 8" 800x1280',
+            chip: 'esp32-p4',
+            board: 'esp32-p4-evboard',
+            displayPlatform: 'mipi_dsi',
+            displayModel: 'SEEED-RETERMINAL-D1001',
+            displayId: 'main_display',
+            touchscreenId: 'device_touchscreen',
+            hardwarePackage: 'hardware/seeedstudio-reterminal-d1001.yaml',
+            resolution: { width: 800, height: 1280 }
+        });
+        expect(profile.features.touch).toBe(true);
+        expect(profile.touch).toMatchObject({ platform: 'gsl3670', id: 'device_touchscreen' });
+        expect(profile.isUntestedProfile).toBe(true);
+        expect(devices.SUPPORTED_DEVICE_IDS).not.toContain('seeedstudio_reterminal_d1001');
+    });
+
     it('recomputes supported ids after loading external profiles', async () => {
         fetchDynamicHardwareProfilesMock.mockResolvedValueOnce([
             {

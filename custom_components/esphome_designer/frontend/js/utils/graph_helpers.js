@@ -67,6 +67,123 @@ export function parseDuration(durationStr) {
 }
 
 /**
+ * Canonical ESPHome time units. ESPHome accepts us/ms/s/min/h/d - but NOT weeks,
+ * so "1w" style values must be converted before they reach the generated YAML.
+ * @type {Record<string, string>}
+ */
+const ESPHOME_TIME_UNITS = {
+    s: 's', sec: 's', secs: 's', second: 's', seconds: 's',
+    m: 'min', min: 'min', mins: 'min', minute: 'min', minutes: 'min',
+    h: 'h', hour: 'h', hours: 'h',
+    d: 'd', day: 'd', days: 'd'
+};
+
+/**
+ * @param {number} seconds
+ * @returns {string}
+ */
+function formatEsphomeTimePeriod(seconds) {
+    const rounded = Math.max(1, Math.round(seconds));
+    if (rounded % 86400 === 0) return `${rounded / 86400}d`;
+    if (rounded % 3600 === 0) return `${rounded / 3600}h`;
+    if (rounded % 60 === 0) return `${rounded / 60}min`;
+    return `${rounded}s`;
+}
+
+/**
+ * Normalizes a duration into a time period ESPHome's config validation accepts.
+ * ESPHome has no "week" unit, so "1w" becomes "7d"; unparseable values fall back.
+ * @param {string|number|null|undefined} value
+ * @param {string} [fallback="1h"]
+ * @returns {string}
+ */
+export function toEsphomeTimePeriod(value, fallback = '1h') {
+    const parsed = parseDurationParts(value);
+    const seconds = durationPartsToSeconds(parsed);
+    if (!Number.isFinite(seconds) || Number(seconds) <= 0) {
+        return fallback;
+    }
+
+    const canonicalUnit = parsed ? ESPHOME_TIME_UNITS[parsed.unit] : null;
+    if (canonicalUnit && parsed && Number.isInteger(parsed.value)) {
+        return `${parsed.value}${canonicalUnit}`;
+    }
+
+    return formatEsphomeTimePeriod(Number(seconds));
+}
+
+/**
+ * Resolves the y_grid step, guaranteeing a value ESPHome accepts (a float > 0).
+ * @param {string|number|null|undefined} rawValue Explicit user value (wins when valid)
+ * @param {string|number|null|undefined} minValue
+ * @param {string|number|null|undefined} maxValue
+ * @returns {string}
+ */
+export function resolveGraphValueGrid(rawValue, minValue, maxValue) {
+    const explicit = parseFloat(String(rawValue ?? ''));
+    if (Number.isFinite(explicit) && explicit > 0) {
+        return String(explicit);
+    }
+
+    const parsedMin = parseFloat(String(minValue ?? ''));
+    const parsedMax = parseFloat(String(maxValue ?? ''));
+    const min = Number.isFinite(parsedMin) ? parsedMin : 0;
+    const max = Number.isFinite(parsedMax) ? parsedMax : 100;
+    const range = Math.abs(max - min);
+    if (!Number.isFinite(range) || range <= 0) {
+        return '1';
+    }
+
+    const step = range / 4;
+    const niceStep = Math.pow(10, Math.floor(Math.log10(step)));
+    const normalized = step / niceStep;
+    const value = normalized <= 1
+        ? niceStep
+        : normalized <= 2
+            ? 2 * niceStep
+            : normalized <= 5
+                ? 5 * niceStep
+                : 10 * niceStep;
+
+    return Number.isFinite(value) && value > 0 ? String(value) : '1';
+}
+
+/**
+ * @param {number} value
+ * @returns {number}
+ */
+const clampGridDivisions = (value) => Math.max(1, Math.min(48, Math.round(value)));
+
+/**
+ * Converts x_grid / y_grid settings into the number of visible grid divisions,
+ * so previews and hand-drawn grids match what ESPHome would render.
+ * @param {{ duration?: string|number, xGrid?: string|number, yGrid?: string|number, minValue?: string|number, maxValue?: string|number }} [options]
+ * @returns {{ x: number, y: number }}
+ */
+export function getGraphGridDivisions(options = {}) {
+    const divisions = { x: 4, y: 4 };
+
+    const totalSeconds = durationPartsToSeconds(parseDurationParts(options.duration));
+    const gridSeconds = durationPartsToSeconds(parseDurationParts(options.xGrid));
+    if (Number.isFinite(totalSeconds) && Number(totalSeconds) > 0
+        && Number.isFinite(gridSeconds) && Number(gridSeconds) > 0) {
+        divisions.x = clampGridDivisions(Number(totalSeconds) / Number(gridSeconds));
+    }
+
+    const step = parseFloat(String(options.yGrid ?? ''));
+    const min = parseFloat(String(options.minValue ?? ''));
+    const max = parseFloat(String(options.maxValue ?? ''));
+    if (Number.isFinite(step) && step > 0 && Number.isFinite(min) && Number.isFinite(max)) {
+        const range = Math.abs(max - min);
+        if (range > 0) {
+            divisions.y = clampGridDivisions(range / step);
+        }
+    }
+
+    return divisions;
+}
+
+/**
  * Infers a readable x-grid interval from the overall graph duration.
  * @param {string|number} durationStr
  * @returns {string}
@@ -79,7 +196,6 @@ export function inferGraphTimeGrid(durationStr) {
     }
 
     const gridSeconds = totalSeconds / 4;
-    if (gridSeconds >= 604800) return `${Math.max(1, Math.round(gridSeconds / 604800))}w`;
     if (gridSeconds >= 86400) return `${Math.max(1, Math.round(gridSeconds / 86400))}d`;
     if (gridSeconds >= 3600) return `${Math.max(1, Math.round(gridSeconds / 3600))}h`;
     if (gridSeconds >= 60) return `${Math.max(1, Math.round(gridSeconds / 60))}min`;
@@ -209,22 +325,30 @@ export function generateHistoricalDataPoints(width, height, min, max, historyDat
 }
 
 /**
+ * Draws the preview grid. The number of divisions follows the configured
+ * x_grid / y_grid so the canvas matches what ESPHome renders on the device.
  * @param {SVGElement} svg
  * @param {number} width
  * @param {number} height
- * @param {string} _xGridStr
- * @param {string} _yGridStr
+ * @param {string} xGridStr x_grid interval, e.g. "24h"
+ * @param {string} yGridStr y_grid step, e.g. "10"
  * @param {string} [color="rgba(0,0,0,0.1)"]
+ * @param {{ duration?: string|number, minValue?: number, maxValue?: number }} [options]
  */
-export function drawInternalGrid(svg, width, height, _xGridStr, _yGridStr, color = "rgba(0,0,0,0.1)") {
+export function drawInternalGrid(svg, width, height, xGridStr, yGridStr, color = "rgba(0,0,0,0.1)", options = {}) {
     const gridGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
     gridGroup.setAttribute("stroke", color);
     gridGroup.setAttribute("stroke-dasharray", "2,2");
     gridGroup.setAttribute("stroke-width", "1");
 
-    // Simple heuristic for grid lines if no specific interval is parsed
-    const xLines = 4;
-    const yLines = 4;
+    // Falls back to a 4x4 heuristic when no interval is configured.
+    const { x: xLines, y: yLines } = getGraphGridDivisions({
+        duration: options.duration,
+        xGrid: xGridStr,
+        yGrid: yGridStr,
+        minValue: options.minValue,
+        maxValue: options.maxValue
+    });
 
     for (let i = 1; i < xLines; i++) {
         const x = (i / xLines) * width;

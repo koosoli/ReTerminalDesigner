@@ -133,4 +133,32 @@ describe('graph exports_lvgl', () => {
         expect(noGrid.obj.widgets).toHaveLength(2);
         expect(noGrid.obj.widgets[0].line.line_color).toBe('0xorange');
     });
+
+    it('draws one LVGL grid line per configured x_grid interval (#482)', () => {
+        const exported = exportLVGL({
+            id: 'graph-daily',
+            width: 300,
+            height: 150,
+            props: {
+                duration: '7d',
+                x_grid: '24h',
+                y_grid: '5',
+                min_value: '0',
+                max_value: '30',
+                color: 'black'
+            }
+        }, {
+            common: { id: 'graph-root' },
+            convertColor: (value) => `0x${value}`,
+            getLVGLFont: (family, size, weight) => `${family}-${size}-${weight}`
+        });
+
+        const gridLines = exported.obj.widgets.filter((widget) => widget.line && !widget.line.id);
+        const vertical = gridLines.filter((widget) => widget.line.points[0].x === widget.line.points[1].x);
+        const horizontal = gridLines.filter((widget) => widget.line.points[0].y === widget.line.points[1].y);
+
+        // 7d / 24h => 7 columns => 6 interior lines; range 30 / 5 => 6 rows => 5 interior lines.
+        expect(vertical).toHaveLength(6);
+        expect(horizontal).toHaveLength(5);
+    });
 });

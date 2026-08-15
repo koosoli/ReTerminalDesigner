@@ -68,7 +68,7 @@ export function addVisibilityConditions(controls, widget) {
 
     controls.addLabeledInputWithPicker("Condition Entity", "text", widget.condition_entity, (value) => {
         AppState.updateWidget(widget.id, { condition_entity: value });
-    }, widget);
+    }, widget, { skipAutoUpdate: true });
 
     const operators = ["==", "!=", "<", ">", "<=", ">="];
     controls.addSelect("Operator", widget.condition_operator, operators, (value) => {
@@ -129,7 +129,7 @@ export function addLVGLStateTriggerControls(controls, widget) {
 
     controls.addLabeledInputWithPicker("Trigger Entity", "text", props.state_trigger_entity || "", (value) => {
         updateProp("state_trigger_entity", value);
-    }, widget);
+    }, widget, { skipAutoUpdate: true });
 
     controls.addSelect("Trigger Type", props.state_trigger_mode || "auto", [
         { value: "auto", label: "Auto (binary uses on_state)" },

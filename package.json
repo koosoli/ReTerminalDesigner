@@ -1,6 +1,6 @@
 {
   "name": "esphome-designer-frontend",
-  "version": "1.0.0-rc.39",
+  "version": "1.0.0-rc.40",
   "description": "Frontend for ESPHome Designer",
   "type": "module",
   "main": "index.html",
@@ -47,6 +47,6 @@
     "vitest": "^1.4.0"
   },
   "dependencies": {
-    "js-yaml": "^4.1.1"
+    "js-yaml": "^4.3.1"
   }
 }

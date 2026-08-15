@@ -132,6 +132,26 @@ describe('JSON Import Verification', () => {
         });
     });
 
+    it('should restore the saved AI provider and model selection', () => {
+        // Regression (#484): the AI model was written into the saved payload but
+        // dropped on load, so the dropdown fell back to an auto-detected model.
+        const layout = {
+            pages: [],
+            device_id: "ai_settings_test",
+            ai_provider: "gemini",
+            ai_model_gemini: "gemini-3.5-pro",
+            ai_model_openai: "gpt-5",
+            ai_model_filter: "pro"
+        };
+
+        loadLayoutIntoState(layout);
+
+        expect(AppState.settings.ai_provider).toBe("gemini");
+        expect(AppState.settings.ai_model_gemini).toBe("gemini-3.5-pro");
+        expect(AppState.settings.ai_model_openai).toBe("gpt-5");
+        expect(AppState.settings.ai_model_filter).toBe("pro");
+    });
+
     it('should prioritize device_id from layout over current state', () => {
         AppState.setCurrentLayoutId("original_id");
 
@@ -209,5 +229,51 @@ describe('JSON Import Verification', () => {
             visible_to: "22:00",
             layout: "4x4"
         }));
+    });
+
+    it('never serializes AI API keys into the exported layout payload', () => {
+        AppState.updateSettings({
+            ai_provider: 'gemini',
+            ai_model_gemini: 'gemini-3.6-flash',
+            ai_api_key_gemini: 'super-secret-key',
+            ai_api_key_openai: 'another-secret-key'
+        });
+
+        // The keys are still available to the running app...
+        expect(AppState.settings.ai_api_key_gemini).toBe('super-secret-key');
+
+        // ...but must not leave via the payload used for file export,
+        // Home Assistant storage and shared snippets.
+        const payload = AppState.getPagesPayload();
+
+        expect(Object.keys(payload).filter((key) => key.startsWith('ai_api_key_'))).toEqual([]);
+        expect(JSON.stringify(payload)).not.toContain('super-secret-key');
+        expect(JSON.stringify(payload)).not.toContain('another-secret-key');
+
+        // Non-secret AI preferences still round-trip.
+        expect(payload.ai_provider).toBe('gemini');
+        expect(payload.ai_model_gemini).toBe('gemini-3.6-flash');
+    });
+
+    it('ignores AI API keys embedded in an imported layout', () => {
+        AppState.updateSettings({
+            ai_api_key_gemini: 'my-own-key',
+            ai_api_key_openai: 'my-own-openai-key'
+        });
+
+        loadLayoutIntoState({
+            pages: [],
+            ai_api_key_gemini: 'someone-elses-key',
+            settings: {
+                ai_api_key_gemini: 'someone-elses-key',
+                ai_api_key_openai: 'someone-elses-openai-key',
+                ai_provider: 'openai'
+            }
+        });
+
+        expect(AppState.settings.ai_api_key_gemini).toBe('my-own-key');
+        expect(AppState.settings.ai_api_key_openai).toBe('my-own-openai-key');
+        // Non-secret settings from the imported layout still apply.
+        expect(AppState.settings.ai_provider).toBe('openai');
     });
 });

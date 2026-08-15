@@ -2,6 +2,34 @@ import { Logger } from '../../utils/logger.js';
 
 /** @typedef {'ai_api_key_gemini'|'ai_api_key_openai'|'ai_api_key_openrouter'|'ai_api_key_minimax'|'ai_api_key_glm'} SecretKey */
 
+/** Prefix identifying settings keys that hold credentials. */
+export const SECRET_KEY_PREFIX = 'ai_api_key_';
+
+/**
+ * @param {string} key
+ * @returns {boolean}
+ */
+export function isSecretSettingKey(key) {
+    return key.startsWith(SECRET_KEY_PREFIX);
+}
+
+/**
+ * Copies settings without any credential keys. Secrets belong to SecretsStore
+ * and its own localStorage entry; they must never be serialized into layout
+ * payloads, which are written to files, saved to Home Assistant, and shared as
+ * snippets.
+ * @param {Record<string, any>} settings
+ * @returns {Record<string, any>}
+ */
+export function omitSecretSettings(settings) {
+    /** @type {Record<string, any>} */
+    const result = {};
+    Object.keys(settings).forEach((key) => {
+        if (!isSecretSettingKey(key)) result[key] = settings[key];
+    });
+    return result;
+}
+
 /** @returns {Storage | null} */
 function getWebStorage() {
     try {
@@ -53,7 +81,7 @@ export class SecretsStore {
             /** @type {Partial<Record<SecretKey, string>>} */
             const keysToSave = {};
             Object.keys(this.keys).forEach((/** @type {string} */ key) => {
-                if (key.startsWith('ai_api_key_')) {
+                if (isSecretSettingKey(key)) {
                     keysToSave[/** @type {SecretKey} */ (key)] = this.keys[/** @type {SecretKey} */ (key)];
                 }
             });

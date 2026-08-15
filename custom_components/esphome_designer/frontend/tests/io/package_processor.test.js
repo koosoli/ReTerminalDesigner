@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
+import jsyaml from 'js-yaml';
 import { processPackageContent, sanitizePackageContent } from '../../js/io/adapters/package_processor.js';
+import geekMagicMiniYaml from '../../hardware/geekmagic-mini-esp8266.yaml?raw';
+import guitionP4LargeYaml from '../../hardware/guition-esp32-p4-jc8012p4a1c.yaml?raw';
+import waveshareEpaperYaml from '../../hardware/waveshare-esp32-universal-epaper-7.5v2.yaml?raw';
 
 describe('Package Processor', () => {
 
@@ -203,6 +207,72 @@ display:
       ].join('\n'));
       expect(result).not.toContain('frequency: 100Hz\n    rotation: 90');
     });
+  });
+
+  // Fix #485: rotation used to be inserted at the first blank line of the
+  // injected `lambda: |-` body, which terminates the block scalar early and
+  // leaves the rest of the drawing code as invalid top-level YAML.
+  describe('rotation placement in real hardware recipes (#485)', () => {
+    // Mirrors the generated lambda shape: colour constants, a blank line, then helpers.
+    const lambdaLines = [
+      'const auto COLOR_WHITE = Color(255, 255, 255);',
+      'const auto COLOR_BLACK = Color(0, 0, 0);',
+      'auto color_off = COLOR_WHITE;',
+      'auto color_on = COLOR_BLACK;',
+      '',
+      '// Helper to print text with word-wrap at widget boundary',
+      'auto print_wrapped_text = [&](int x, int y) { };',
+      '',
+      'it.print(0, 0, id(font1), "Hello");'
+    ];
+
+    // The exported snippet auto-comments system blocks; drop comments so js-yaml
+    // can parse what remains as a plain document.
+    const stripComments = (yaml) => yaml.split('\n').filter((l) => !l.trimStart().startsWith('#')).join('\n');
+
+    const recipes = [
+      ['GeekMagic Mini (no rotation in recipe)', geekMagicMiniYaml, { width: 240, height: 240 }, [0, 90, 180, 270]],
+      ['Guition P4 JC8012P4A1C (rotation: 90 in recipe)', guitionP4LargeYaml, { width: 1280, height: 800 }, [90, 180, 270, 0]],
+      ['Waveshare e-paper 7.5 (rotation: 0° in recipe)', waveshareEpaperYaml, { width: 800, height: 480 }, ['0°', '90°', '180°', '270°']]
+    ];
+
+    const orientations = ['landscape', 'portrait', 'landscape_inverted', 'portrait_inverted'];
+
+    for (const [label, recipe, resolution, expectedRotations] of recipes) {
+      orientations.forEach((orientation, index) => {
+        it(`keeps the lambda intact and rotation a display key for ${label} in ${orientation}`, () => {
+          const result = processPackageContent(
+            recipe,
+            lambdaLines,
+            [],
+            { isPackageBased: true, resolution },
+            { orientation },
+            false,
+            []
+          );
+
+          const doc = jsyaml.load(stripComments(result));
+          const display = doc.display[0];
+          const keys = Object.keys(display);
+
+          // rotation must be a mapping key, not text swallowed by the lambda
+          expect(keys).toContain('rotation');
+          expect(display.rotation).toBe(expectedRotations[index]);
+          expect(String(display.lambda)).not.toContain('rotation:');
+
+          // and it must be emitted before the block scalar starts
+          expect(keys.indexOf('rotation')).toBeLessThan(keys.indexOf('lambda'));
+
+          // the whole lambda body survives as one unbroken block scalar
+          expect(String(display.lambda)).toContain('auto color_on = COLOR_BLACK;');
+          expect(String(display.lambda)).toContain('// Helper to print text with word-wrap at widget boundary');
+          expect(String(display.lambda)).toContain('it.print(0, 0, id(font1), "Hello");');
+
+          // recipes that already declare rotation must not gain a second one
+          expect(result.match(/^\s*rotation:/gm)).toHaveLength(1);
+        });
+      });
+    }
   });
 
 });

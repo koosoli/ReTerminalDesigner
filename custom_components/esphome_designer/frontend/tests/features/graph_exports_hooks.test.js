@@ -167,9 +167,91 @@ describe('graph exports_hooks', () => {
         expect(joined).toContain('red_int: 255');
         expect(joined).toContain('green_int: 165');
         expect(joined).toContain('blue_int: 0');
-        expect(joined).toContain('x_grid: 1h');
+        expect(joined).toContain('duration: 1h');
+        expect(joined).toContain('x_grid: 15min');
         expect(joined).toContain('x_grid: 23min');
         expect(joined).toContain('x_grid: 2d');
+    });
+
+    it('emits ESPHome-valid time periods for week-based durations and grids (#482)', () => {
+        const lines = [];
+
+        onExportComponents({
+            lines,
+            isLvgl: false,
+            profile: { features: {} },
+            layout: { darkMode: false, pages: [{ dark_mode: 'light' }] },
+            widgets: [
+                {
+                    id: 'graph-week',
+                    type: 'graph',
+                    width: 300,
+                    height: 150,
+                    entity_id: 'sensor.outside_temp',
+                    props: { duration: '1w', x_grid: '1w', color: 'black' }
+                },
+                {
+                    id: 'graph-month',
+                    type: 'graph',
+                    width: 300,
+                    height: 150,
+                    entity_id: 'sensor.rain',
+                    props: { duration: '4w', color: 'black' }
+                }
+            ]
+        });
+
+        const joined = lines.join('\n');
+        // ESPHome time periods have no week unit - "1w" would fail config validation.
+        expect(joined).not.toMatch(/(duration|x_grid): *\d+w\b/);
+        expect(joined).toContain('duration: 7d');
+        expect(joined).toContain('duration: 28d');
+        expect(joined).toContain('x_grid: 7d');
+    });
+
+    it('emits one x_grid line per day and a positive y_grid step (#482)', () => {
+        const lines = [];
+
+        onExportComponents({
+            lines,
+            isLvgl: false,
+            profile: { features: {} },
+            layout: { darkMode: false, pages: [{ dark_mode: 'light' }] },
+            widgets: [
+                {
+                    id: 'graph-daily',
+                    type: 'graph',
+                    width: 300,
+                    height: 150,
+                    entity_id: 'sensor.outside_temp',
+                    props: {
+                        duration: '7d',
+                        x_grid: '24h',
+                        y_grid: '5',
+                        auto_scale: false,
+                        min_value: '0',
+                        max_value: '30',
+                        color: 'black'
+                    }
+                },
+                {
+                    // Degenerate range: y_grid must never be emitted as 0 (ESPHome needs > 0).
+                    id: 'graph-flat',
+                    type: 'graph',
+                    width: 100,
+                    height: 50,
+                    entity_id: 'sensor.flat',
+                    props: { duration: '7d', min_value: '50', max_value: '50', color: 'black' }
+                }
+            ]
+        });
+
+        const joined = lines.join('\n');
+        expect(joined).toContain('duration: 7d');
+        expect(joined).toContain('x_grid: 24h');
+        expect(joined).toContain('y_grid: 5');
+        expect(joined).not.toContain('y_grid: 0');
+        expect(joined).not.toContain('y_grid: NaN');
     });
 
     it('exports LVGL and HA-history globals for graph widgets', () => {

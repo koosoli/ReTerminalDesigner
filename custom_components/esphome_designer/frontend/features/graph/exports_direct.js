@@ -1,7 +1,14 @@
 /** @typedef {Widget & { props?: Record<string, any>, entity_id?: string, title?: string }} GraphWidget */
 
 import { clampFontWeight } from '../../js/core/font_weights.js';
-import { formatGraphLookbackLabel, inferGraphTimeGrid, parseDuration } from '../../js/utils/graph_helpers.js';
+import {
+    formatGraphLookbackLabel,
+    getGraphGridDivisions,
+    inferGraphTimeGrid,
+    parseDuration,
+    resolveGraphValueGrid,
+    toEsphomeTimePeriod
+} from '../../js/utils/graph_helpers.js';
 
 /**
  * @param {GraphWidget} w
@@ -32,24 +39,20 @@ export const exportDoc = (w, context) => {
     const fontId = addFont(fontFamily, fontWeight, fontSize);
 
     const gridEnabled = p.grid !== false;
-    let xGrid = p.x_grid || "";
-    let yGrid = p.y_grid || "";
-
-    if (gridEnabled) {
-        if (!xGrid) {
-            xGrid = inferGraphTimeGrid(duration);
-        }
-        if (!yGrid) {
-            const minY = parseFloat(minValue) || 0;
-            const maxY = parseFloat(maxValue) || 100;
-            const range = maxY - minY;
-            const step = range / 4;
-            const niceStep = Math.pow(10, Math.floor(Math.log10(step)));
-            const normalized = step / niceStep;
-            const yGridValue = normalized <= 1 ? niceStep : normalized <= 2 ? 2 * niceStep : normalized <= 5 ? 5 * niceStep : 10 * niceStep;
-            yGrid = String(yGridValue);
-        }
-    }
+    const xGrid = gridEnabled
+        ? toEsphomeTimePeriod(p.x_grid || inferGraphTimeGrid(duration), inferGraphTimeGrid(duration))
+        : "";
+    const yGrid = gridEnabled ? resolveGraphValueGrid(p.y_grid, minValue, maxValue) : "";
+    // The native it.graph() renderer draws its own grid from the graph: component
+    // config, so a hand-drawn overlay is only needed for the HA-history path.
+    const usesNativeGraph = !p.use_ha_history;
+    const gridDivisions = getGraphGridDivisions({
+        duration,
+        xGrid,
+        yGrid,
+        minValue: parseFloat(minValue) || 0,
+        maxValue: parseFloat(maxValue) || 100
+    });
 
     const cond = getConditionCheck(w);
     if (cond) lines.push(`        ${cond}`);
@@ -136,23 +139,25 @@ export const exportDoc = (w, context) => {
             addDitherMask(lines, colorProp, isEpaper, w.x, w.y, w.width, w.height);
         }
 
-        if (yGrid) {
-            const ySteps = 4;
-            for (let index = 1; index < ySteps; index += 1) {
-                const yOffset = Math.round(w.height * (index / ySteps));
-                lines.push(`        for (int i = 0; i < ${w.width}; i += 4) {`);
-                lines.push(`          it.draw_pixel_at(${w.x} + i, ${w.y + yOffset}, ${color});`);
-                lines.push('        }');
+        if (!usesNativeGraph && gridEnabled) {
+            if (yGrid) {
+                const ySteps = gridDivisions.y;
+                for (let index = 1; index < ySteps; index += 1) {
+                    const yOffset = Math.round(w.height * (index / ySteps));
+                    lines.push(`        for (int i = 0; i < ${w.width}; i += 4) {`);
+                    lines.push(`          it.draw_pixel_at(${w.x} + i, ${w.y + yOffset}, ${color});`);
+                    lines.push('        }');
+                }
             }
-        }
 
-        if (xGrid) {
-            const xSteps = 4;
-            for (let index = 1; index < xSteps; index += 1) {
-                const xOffset = Math.round(w.width * (index / xSteps));
-                lines.push(`        for (int i = 0; i < ${w.height}; i += 4) {`);
-                lines.push(`          it.draw_pixel_at(${w.x + xOffset}, ${w.y} + i, ${color});`);
-                lines.push('        }');
+            if (xGrid) {
+                const xSteps = gridDivisions.x;
+                for (let index = 1; index < xSteps; index += 1) {
+                    const xOffset = Math.round(w.width * (index / xSteps));
+                    lines.push(`        for (int i = 0; i < ${w.height}; i += 4) {`);
+                    lines.push(`          it.draw_pixel_at(${w.x + xOffset}, ${w.y} + i, ${color});`);
+                    lines.push('        }');
+                }
             }
         }
 

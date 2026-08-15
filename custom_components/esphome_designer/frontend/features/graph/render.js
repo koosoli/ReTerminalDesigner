@@ -54,15 +54,6 @@ export const render = (el, widget, { getColorStyle }) => {
     svg.setAttribute("viewBox", `0 0 ${widget.width} ${widget.height}`);
     svg.style.display = "block";
 
-    drawInternalGrid(
-        svg,
-        widget.width,
-        widget.height,
-        props.x_grid,
-        props.y_grid,
-        isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"
-    );
-
     const minValue = props.auto_scale !== false ? Number.NaN : (parseFloat(props.min_value) || 0);
     const maxValue = props.auto_scale !== false ? Number.NaN : (parseFloat(props.max_value) || 100);
 
@@ -157,6 +148,23 @@ export const render = (el, widget, { getColorStyle }) => {
     }
     if (isNaN(effectiveMin)) effectiveMin = 0;
     if (isNaN(effectiveMax)) effectiveMax = 100;
+
+    // Drawn after the scale is known so the y-grid step maps to real divisions.
+    if (props.grid !== false) {
+        drawInternalGrid(
+            svg,
+            widget.width,
+            widget.height,
+            props.x_grid,
+            props.y_grid,
+            isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+            {
+                duration: props.duration || "1h",
+                minValue: effectiveMin,
+                maxValue: effectiveMax
+            }
+        );
+    }
 
     const points = generateHistoricalDataPoints(
         widget.width,

@@ -481,6 +481,22 @@ export const DEVICE_PROFILES = {
     features: { psram: true, buzzer: false, buttons: false, lcd: true, lvgl: true, touch: true },
     touch: { platform: "gt911", id: "device_touchscreen" }
   },
+  seeedstudio_reterminal_d1001: {
+    name: "Seeed Studio reTerminal D1001 8\" 800x1280",
+    displayType: "color",
+    chip: "esp32-p4",
+    board: "esp32-p4-evboard",
+    displayPlatform: "mipi_dsi",
+    displayModel: "SEEED-RETERMINAL-D1001",
+    displayId: "main_display",
+    touchscreenId: "device_touchscreen",
+    isPackageBased: true,
+    isUntestedProfile: true,
+    hardwarePackage: "hardware/seeedstudio-reterminal-d1001.yaml",
+    resolution: { width: 800, height: 1280 },
+    features: { psram: true, buzzer: false, buttons: false, lcd: true, lvgl: true, touch: true },
+    touch: { platform: "gsl3670", id: "device_touchscreen" }
+  },
   elecrow_esp32_p4_9inch_v1_2: {
     name: "Elecrow ESP32-P4 9\" HMI 1024x600 (V1.2)",
     displayType: "color",

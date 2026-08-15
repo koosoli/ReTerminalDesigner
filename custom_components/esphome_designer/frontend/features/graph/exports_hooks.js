@@ -1,6 +1,6 @@
 import { getSensorPlatformLines } from '../../js/io/adapters/mqtt_helpers.js';
 import { buildLvglBoundsLines, buildLvglLineUpdateAction, buildLvglLiveUpdateAction, getLvglGraphIds, getLvglGraphPointCount } from './exports_lvgl.js';
-import { inferGraphTimeGrid } from '../../js/utils/graph_helpers.js';
+import { inferGraphTimeGrid, resolveGraphValueGrid, toEsphomeTimePeriod } from '../../js/utils/graph_helpers.js';
 
 /** @typedef {Widget & { props?: Record<string, any>, entity_id?: string, _pageIndex?: number }} GraphWidget */
 
@@ -85,30 +85,22 @@ export const onExportComponents = (context) => {
             const p = w.props || {};
             const safeId = `graph_${w.id}`.replace(/-/g, "_");
             const colorId = `graph_color_${w.id}`.replace(/-/g, "_");
-            const duration = p.duration || "1h";
+            // ESPHome has no "week" unit: 1w must be emitted as 7d or the config fails validation.
+            const duration = toEsphomeTimePeriod(p.duration || "1h");
             const width = parseInt(String(w.width), 10);
             const height = parseInt(String(w.height), 10);
             const maxRange = p.max_range ? parseFloat(p.max_range) : null;
             const minRange = p.min_range ? parseFloat(p.min_range) : null;
 
             const gridEnabled = p.grid !== false;
-            let xGrid = p.x_grid || "";
-            let yGrid = p.y_grid || "";
+            let xGrid = "";
+            let yGrid = "";
 
             if (gridEnabled) {
-                if (!xGrid) {
-                    xGrid = inferGraphTimeGrid(duration);
-                }
-                if (!yGrid) {
-                    const minValue = parseFloat(p.min_value) || 0;
-                    const maxValue = parseFloat(p.max_value) || 100;
-                    const range = maxValue - minValue;
-                    const step = range / 4;
-                    const niceStep = Math.pow(10, Math.floor(Math.log10(step)));
-                    const normalized = step / niceStep;
-                    const yGridValue = normalized <= 1 ? niceStep : normalized <= 2 ? 2 * niceStep : normalized <= 5 ? 5 * niceStep : 10 * niceStep;
-                    yGrid = String(yGridValue);
-                }
+                // x_grid is a time period relative to duration (24h => one line per day).
+                xGrid = toEsphomeTimePeriod(p.x_grid || inferGraphTimeGrid(duration), inferGraphTimeGrid(duration));
+                // y_grid must be a float > 0 for ESPHome, never 0/NaN.
+                yGrid = resolveGraphValueGrid(p.y_grid, p.min_value, p.max_value);
             }
 
             let entityId = (w.entity_id || "").trim();

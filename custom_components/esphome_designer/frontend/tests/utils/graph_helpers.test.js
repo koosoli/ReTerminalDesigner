@@ -1,12 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
     formatGraphLookbackLabel,
+    getGraphGridDivisions,
     inferGraphTimeGrid,
     parseDuration,
     generateMockData,
     generateHistoricalDataPoints,
     drawInternalGrid,
-    drawSmartAxisLabels
+    drawSmartAxisLabels,
+    resolveGraphValueGrid,
+    toEsphomeTimePeriod
 } from '../../js/utils/graph_helpers.js';
 
 describe('graph_helpers', () => {
@@ -76,10 +79,51 @@ describe('graph_helpers', () => {
         expect(invalid).toHaveLength(50);
     });
 
+    it('normalizes durations into units ESPHome accepts (#482)', () => {
+        expect(toEsphomeTimePeriod('1w')).toBe('7d');
+        expect(toEsphomeTimePeriod('2w')).toBe('14d');
+        expect(toEsphomeTimePeriod('7d')).toBe('7d');
+        expect(toEsphomeTimePeriod('24h')).toBe('24h');
+        expect(toEsphomeTimePeriod('90min')).toBe('90min');
+        expect(toEsphomeTimePeriod('10m')).toBe('10min');
+        expect(toEsphomeTimePeriod('1.5h')).toBe('90min');
+        expect(toEsphomeTimePeriod('bad')).toBe('1h');
+        expect(toEsphomeTimePeriod('0s', '15min')).toBe('15min');
+    });
+
+    it('never infers a week-based x_grid interval (#482)', () => {
+        expect(inferGraphTimeGrid('4w')).toBe('7d');
+        expect(inferGraphTimeGrid('28d')).toBe('7d');
+    });
+
+    it('resolves a positive y_grid step even for degenerate ranges (#482)', () => {
+        expect(resolveGraphValueGrid('5', '0', '30')).toBe('5');
+        expect(resolveGraphValueGrid('', '0', '100')).toBe('50');
+        expect(resolveGraphValueGrid('0', '50', '50')).toBe('1');
+        expect(resolveGraphValueGrid('-2', '50', '50')).toBe('1');
+    });
+
+    it('derives grid divisions from x_grid and y_grid settings (#482)', () => {
+        expect(getGraphGridDivisions({ duration: '7d', xGrid: '24h' }).x).toBe(7);
+        expect(getGraphGridDivisions({ duration: '1w', xGrid: '24h' }).x).toBe(7);
+        expect(getGraphGridDivisions({}).x).toBe(4);
+        expect(getGraphGridDivisions({ duration: '1h', xGrid: 'bad' }).x).toBe(4);
+        expect(getGraphGridDivisions({ yGrid: '25', minValue: 0, maxValue: 100 }).y).toBe(4);
+        expect(getGraphGridDivisions({ yGrid: '5', minValue: 0, maxValue: 30 }).y).toBe(6);
+        // Guard against pathological configurations flooding the canvas.
+        expect(getGraphGridDivisions({ duration: '30d', xGrid: '1min' }).x).toBe(48);
+    });
+
     it('draws grid and axis labels onto dom', () => {
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         drawInternalGrid(svg, 200, 100, '', '');
         expect(svg.querySelectorAll('line').length).toBeGreaterThan(0);
+
+        const dailySvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        drawInternalGrid(dailySvg, 280, 100, '24h', '', 'rgba(0,0,0,0.1)', { duration: '7d' });
+        const vertical = Array.from(dailySvg.querySelectorAll('line'))
+            .filter((line) => line.getAttribute('x1') === line.getAttribute('x2'));
+        expect(vertical).toHaveLength(6);
 
         const container = document.createElement('div');
         container.style.width = '240px';

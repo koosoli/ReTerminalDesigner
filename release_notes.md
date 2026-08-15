@@ -1,3 +1,22 @@
+## v1.0.0 RC40 - reTerminal D1001, Rotation and Graph Grid Fixes
+**Release Date:** August 15, 2026
+
+### Features
+- **Seeed Studio reTerminal D1001 Profile (Issue #470):** Added an untested hardware recipe for the 8" reTerminal D1001 (ESP32-P4 with an ESP32-C6 companion, 800x1280 MIPI-DSI). The profile uses ESPHome's built-in `SEEED-RETERMINAL-D1001` display model, the `gsl3670` touchscreen model, and the required XL9535 expander, so it needs ESPHome 2026.7.0 or newer.
+
+### Security
+- **AI API Keys Embedded in Exported Layouts:** Layout payloads no longer carry AI provider API keys. Exported layout JSON, layouts saved to Home Assistant, and shared snippets previously embedded every configured key in plaintext, so sharing a layout disclosed the key. Keys now stay in browser local storage only. Importing a layout also ignores any keys it contains, so opening a shared layout can no longer overwrite local credentials. Anyone who has shared a layout file or snippet should rotate their AI provider keys.
+
+### Fixes
+- **Rotation Inserted Inside the Display Lambda (Issue #485):** Display rotation is no longer spliced into the middle of the `display:` lambda block scalar. The merger previously located the display entry with a text pattern that stopped at the first blank line inside the generated lambda, which terminated the block scalar early and orphaned the remaining drawing code. Rotation is now placed with the other `display:` keys ahead of `lambda:`, and base rotation detection no longer matches `rotation:` text inside the lambda body.
+- **Graph Grid Settings Ignored (Issue #482):** The "1 Week" and "2 Weeks" duration presets emitted `duration: 1w`, which ESPHome rejects because it has no week unit. Presets now emit `7d` and `14d`, and previously saved week values are converted on export. The canvas preview and the LVGL export now draw the configured `x_grid`/`y_grid` instead of a fixed 4x4 grid, the direct/lambda export no longer paints a second grid over the one ESPHome already renders, and a degenerate value range no longer emits `y_grid: 0`.
+- **Gemini Model Selection Reverting (Issue #484):** Selecting a Gemini model no longer reverts to the previous default. The model was persisted under an `ai_model_undefined` key whenever the AI provider had never been changed from its default, so the saved value was never read back. The selection now survives closing and reopening settings, a page reload, and an active model filter, and the offline fallback model no longer points at a retired Gemini release.
+- **Entity Picker Overwriting Widget Bindings:** The browse buttons for "Trigger Entity" and "Condition Entity" no longer overwrite the widget's own `entity_id` and title when picking an entity for a state trigger or visibility condition.
+- **js-yaml Security Update (PR #481):** Upgraded `js-yaml` to 4.3.1 for GHSA-5p4m-2wfm-xmqj, a quadratic CPU consumption issue in `!!omap` resolution that is reachable when parsing imported YAML.
+- **Release Metadata Refresh:** Updated package metadata, Home Assistant manifest version, visible header label, release notes, schema baseline, and rebuilt frontend assets for RC40.
+
+---
+
 ## v1.0.0 RC39 - Auth Fix and Unique Touch Area IDs
 **Release Date:** August 8, 2026
 

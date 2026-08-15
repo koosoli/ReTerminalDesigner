@@ -23,6 +23,47 @@ export class AIService {
         };
     }
 
+    /**
+     * Last-resort model ids, used only when the provider's live model list is
+     * unavailable. Google retires Gemini models aggressively (gemini-2.0-flash
+     * and gemini-2.5-flash both stopped accepting new users), so prefer the
+     * live list wherever possible.
+     */
+    static get FALLBACK_MODELS() {
+        return {
+            gemini: 'gemini-3.6-flash'
+        };
+    }
+
+    /**
+     * Picks a sensible default from a live model list: the newest stable
+     * general-purpose "flash" model, then the newest "pro", then anything.
+     * Version-ranking (rather than "first flash wins") keeps auto-detection off
+     * older, deprecated generations that the API still advertises.
+     */
+    static pickPreferredModel(models) {
+        if (!models || models.length === 0) return null;
+
+        const isGeneralPurpose = (id) => !/(image|audio|tts|live|embedding|aqa)/.test(id);
+        const isStable = (id) => !/(preview|exp|latest)/.test(id);
+        const rank = (id) => {
+            const match = /(\d+(?:\.\d+)?)/.exec(id);
+            const version = match ? parseFloat(match[1]) : 0;
+            return id.includes('lite') ? version - 0.01 : version;
+        };
+
+        const best = (predicate) => models
+            .filter((m) => isGeneralPurpose(m.id) && predicate(m.id))
+            .sort((a, b) => rank(b.id) - rank(a.id))[0];
+
+        const preferred = best((id) => isStable(id) && id.includes('flash')) ||
+            best((id) => isStable(id) && id.includes('pro')) ||
+            best(() => true) ||
+            models[0];
+
+        return preferred ? preferred.id : null;
+    }
+
     getSettings() {
         return AppState.settings;
     }
@@ -91,13 +132,9 @@ export class AIService {
             Logger.log("No model selected, attempting to auto-detect...");
             try {
                 const availableModels = await this.fetchModels(provider, apiKey);
-                if (availableModels.length > 0) {
-                    // Strictly prefer flash models for speed/quota, then standard pro
-                    const preferred = availableModels.find(m => m.id.includes('flash')) ||
-                        availableModels.find(m => m.id.includes('1.5-pro')) ||
-                        availableModels.find(m => m.id.includes('gemini-pro')) ||
-                        availableModels[0];
-                    model = preferred.id;
+                const preferred = AIService.pickPreferredModel(availableModels);
+                if (preferred) {
+                    model = preferred;
                     Logger.log(`Auto-detected model: ${model}`);
 
                     // Persist for next time
@@ -107,7 +144,7 @@ export class AIService {
                 }
             } catch (e) {
                 Logger.error("Auto-detection failed:", e);
-                model = 'gemini-2.0-flash';
+                model = AIService.FALLBACK_MODELS.gemini;
             }
         }
 

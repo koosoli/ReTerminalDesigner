@@ -5,6 +5,7 @@ import geekMagicProYaml from '../../hardware/geekmagic-pro-esp32.yaml?raw';
 import guitionP4Yaml from '../../hardware/guition-esp32-p4-jc4880p443.yaml?raw';
 import guitionP4LargeYaml from '../../hardware/guition-esp32-p4-jc8012p4a1c.yaml?raw';
 import elecrowP4Yaml from '../../hardware/elecrow-esp32-p4-9inch-v1.2.yaml?raw';
+import reterminalD1001Yaml from '../../hardware/seeedstudio-reterminal-d1001.yaml?raw';
 import m5stackTab5Yaml from '../../hardware/m5stack-tab5.yaml?raw';
 import sunton2432s028Yaml from '../../hardware/sunton-esp32-2432s028.yaml?raw';
 import sunton2432s028RYaml from '../../hardware/sunton-esp32-2432s028R.yaml?raw';
@@ -196,6 +197,33 @@ display:
         expect(profile.board).toBe('esp32-p4-evboard');
         expect(profile.displayPlatform).toBe('mipi_dsi');
         expect(profile.displayModel).toBe('JC8012P4A1');
+        expect(profile.features.psram).toBe(true);
+        expect(profile.features.touch).toBe(true);
+        expect(profile.features.lcd).toBe(true);
+    });
+
+    it('parses the reTerminal D1001 bundled recipe with its XL9535 and GSL3670 wiring', () => {
+        expect(reterminalD1001Yaml).toContain('esp_ldo:');
+        expect(reterminalD1001Yaml).toContain('esp32_hosted:');
+        expect(reterminalD1001Yaml).toContain('mode: hex');
+        expect(reterminalD1001Yaml).toContain('flash_size: 32MB');
+        expect(reterminalD1001Yaml).toContain('xl9535:');
+        expect(reterminalD1001Yaml).toContain('platform: gsl3670');
+        expect(reterminalD1001Yaml).toContain('model: SEEED-RETERMINAL-D1001');
+        expect(reterminalD1001Yaml).toContain('pin: GPIO14');
+        expect(reterminalD1001Yaml).toContain('id: main_display');
+        expect(reterminalD1001Yaml).toContain('id: device_touchscreen');
+        expect(reterminalD1001Yaml).toContain('audio_dac:');
+        expect(reterminalD1001Yaml).toContain('audio_adc:');
+
+        const profile = parseHardwareRecipeClientSide(reterminalD1001Yaml, 'seeedstudio-reterminal-d1001.yaml');
+
+        expect(profile.name).toBe('Seeed Studio reTerminal D1001');
+        expect(profile.resolution).toEqual({ width: 800, height: 1280 });
+        expect(profile.chip).toBe('esp32-p4');
+        expect(profile.board).toBe('esp32-p4-evboard');
+        expect(profile.displayPlatform).toBe('mipi_dsi');
+        expect(profile.displayModel).toBe('SEEED-RETERMINAL-D1001');
         expect(profile.features.psram).toBe(true);
         expect(profile.features.touch).toBe(true);
         expect(profile.features.lcd).toBe(true);

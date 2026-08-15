@@ -30,8 +30,9 @@ const DURATION_PRESET_OPTIONS = [
     { value: '12h', label: '12 Hours' },
     { value: '1d', label: '1 Day' },
     { value: '3d', label: '3 Days' },
-    { value: '1w', label: '1 Week' },
-    { value: '2w', label: '2 Weeks' },
+    // ESPHome time periods have no "week" unit, so weeks are expressed in days.
+    { value: '7d', label: '1 Week' },
+    { value: '14d', label: '2 Weeks' },
     { value: 'custom', label: 'Custom...' }
 ];
 
@@ -176,7 +177,7 @@ const renderProperties = (panel, widget) => {
         }
     });
     panel.addLabeledInput("Duration", "text", duration, setTextProp("duration"));
-    panel.addHint("Pick a preset or enter a custom span like 90min, 12h, 7d, or 1w.");
+    panel.addHint("Pick a preset or enter a custom span like 90min, 12h, or 7d. ESPHome has no week unit, so use 7d instead of 1w.");
     panel.addHint("The device collects data from boot. The graph fills up over the configured duration.");
     panel.endSection();
 
@@ -239,7 +240,8 @@ const renderProperties = (panel, widget) => {
     panel.addCheckbox("Show Grid", props.grid !== false, setBoolProp("grid"));
     panel.addLabeledInput("X Grid Interval", "text", props.x_grid || "", setTextProp("x_grid"));
     panel.addLabeledInput("Y Grid Step", "number", props.y_grid || "", setTextProp("y_grid"));
-    panel.addHint("e.g. 1h for X, or 10.0 for Y. Leave empty for auto-grid.");
+    panel.addHint("X Grid is a time span, not a line count: <code>24h</code> draws one vertical line per day (set Duration to <code>7d</code> for a week of days). Y Grid is a step in sensor units, e.g. <code>5</code>.");
+    panel.addHint("Leave empty for an auto-grid of 4 divisions.");
     panel.endSection();
 
     panel.createSection("Border Style", false);

@@ -46,8 +46,9 @@ describe('graph exports_direct', () => {
         expect(output).toContain('it.graph(10, 20, id(graph_graph_1));');
         expect(output).toContain('it.rectangle(10 + 0, 20 + 0, 120 - 2 * 0, 60 - 2 * 0, Color(navy));');
         expect(output).toContain('it.printf(10 - 4, 20 + 30 - 6, id(graph_font), Color(blue), TextAlign::TOP_RIGHT, "%.0f", (float)40);');
-        expect(output).toContain('it.draw_pixel_at(10 + i, 35, Color(blue));');
-        expect(output).toContain('it.draw_pixel_at(40, 20 + i, Color(blue));');
+        // Regression (#482): it.graph() already draws the grid from the graph: component,
+        // so the lambda must not paint a second, fixed 4x4 grid on top of it.
+        expect(output).not.toContain('it.draw_pixel_at(');
         expect(output).toContain('it.printf(10 + 0, 20 + 60 + 2, id(graph_font), Color(blue), TextAlign::TOP_LEFT, "-2.0h");');
         expect(output).toContain('it.printf(10 + 60, 20 + 60 + 2, id(graph_font), Color(blue), TextAlign::TOP_CENTER, "-1.0h");');
         expect(output).toContain('it.printf(10 + 120, 20 + 60 + 2, id(graph_font), Color(blue), TextAlign::TOP_RIGHT, "Now");');
@@ -100,6 +101,60 @@ describe('graph exports_direct', () => {
         }, context);
 
         expect(context.lines.join('\n')).toContain('Graph (no entity)');
+    });
+
+    it('draws one hand-rolled grid division per x_grid interval for HA-history graphs', () => {
+        const context = createContext();
+
+        exportDoc({
+            id: 'graph-grid',
+            x: 0,
+            y: 0,
+            width: 280,
+            height: 140,
+            entity_id: 'sensor.energy',
+            props: {
+                use_ha_history: true,
+                auto_scale: false,
+                duration: '7d',
+                x_grid: '24h',
+                y_grid: '10',
+                min_value: '0',
+                max_value: '30',
+                color: 'black'
+            }
+        }, context);
+
+        const output = context.lines.join('\n');
+        // 7d / 24h => 7 columns => 6 interior vertical lines.
+        const verticalLines = output.match(/it\.draw_pixel_at\(\d+, 0 \+ i,/g) || [];
+        expect(verticalLines).toHaveLength(6);
+        // range 30 / y_grid 10 => 3 rows => 2 interior horizontal lines.
+        const horizontalLines = output.match(/it\.draw_pixel_at\(0 \+ i, \d+,/g) || [];
+        expect(horizontalLines).toHaveLength(2);
+    });
+
+    it('omits hand-rolled grid lines when the grid is switched off', () => {
+        const context = createContext();
+
+        exportDoc({
+            id: 'graph-nogrid',
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 50,
+            entity_id: 'sensor.energy',
+            props: {
+                use_ha_history: true,
+                grid: false,
+                duration: '7d',
+                x_grid: '24h',
+                y_grid: '10',
+                color: 'black'
+            }
+        }, context);
+
+        expect(context.lines.join('\n')).not.toContain('it.draw_pixel_at(');
     });
 
     it('formats week-long graph labels with day and week units', () => {

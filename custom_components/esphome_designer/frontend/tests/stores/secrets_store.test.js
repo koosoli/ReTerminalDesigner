@@ -85,3 +85,36 @@ describe('SecretsStore', () => {
         }
     });
 });
+
+describe('omitSecretSettings', () => {
+    it('strips credential keys and keeps everything else', async () => {
+        const { omitSecretSettings, isSecretSettingKey } = await import('../../js/core/stores/secrets_store.js');
+
+        const result = omitSecretSettings({
+            orientation: 'landscape',
+            ai_provider: 'gemini',
+            ai_model_gemini: 'gemini-3.6-flash',
+            ai_api_key_gemini: 'secret-key',
+            ai_api_key_openai: 'another-secret',
+            ai_api_key_openrouter: '',
+            ai_api_key_minimax: '',
+            ai_api_key_glm: ''
+        });
+
+        expect(result).toEqual({
+            orientation: 'landscape',
+            ai_provider: 'gemini',
+            ai_model_gemini: 'gemini-3.6-flash'
+        });
+        expect(Object.keys(result).some(isSecretSettingKey)).toBe(false);
+    });
+
+    it('does not mutate the source object', async () => {
+        const { omitSecretSettings } = await import('../../js/core/stores/secrets_store.js');
+
+        const source = { ai_api_key_gemini: 'secret-key', orientation: 'portrait' };
+        omitSecretSettings(source);
+
+        expect(source.ai_api_key_gemini).toBe('secret-key');
+    });
+});

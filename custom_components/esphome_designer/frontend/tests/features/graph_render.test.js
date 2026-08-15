@@ -200,6 +200,59 @@ describe('graph render', () => {
         expect(artboard.querySelectorAll('.graph-axis-label[data-widget-id="graph_hidden"]')).toHaveLength(0);
     });
 
+    it('draws one preview grid line per configured x_grid interval (#482)', () => {
+        mockGetEntityAttributes.mockReturnValue(null);
+        mockFetchEntityHistory.mockResolvedValue([]);
+
+        const el = document.createElement('div');
+        render(el, {
+            id: 'graph_grid',
+            x: 0,
+            y: 0,
+            width: 280,
+            height: 140,
+            entity_id: '',
+            props: {
+                duration: '7d',
+                x_grid: '24h',
+                y_grid: '25',
+                auto_scale: false,
+                min_value: '0',
+                max_value: '100'
+            }
+        }, {
+            getColorStyle: (value) => value || '#000000'
+        });
+
+        const lines = Array.from(el.querySelectorAll('line'));
+        // 7d / 24h => 7 columns => 6 interior vertical lines.
+        const vertical = lines.filter((line) => line.getAttribute('x1') === line.getAttribute('x2'));
+        expect(vertical).toHaveLength(6);
+        // range 100 / 25 => 4 rows => 3 interior horizontal lines.
+        const horizontal = lines.filter((line) => line.getAttribute('y1') === line.getAttribute('y2'));
+        expect(horizontal).toHaveLength(3);
+    });
+
+    it('hides the preview grid when Show Grid is disabled (#482)', () => {
+        mockGetEntityAttributes.mockReturnValue(null);
+        mockFetchEntityHistory.mockResolvedValue([]);
+
+        const el = document.createElement('div');
+        render(el, {
+            id: 'graph_nogrid',
+            x: 0,
+            y: 0,
+            width: 200,
+            height: 100,
+            entity_id: '',
+            props: { duration: '1h', grid: false }
+        }, {
+            getColorStyle: (value) => value || '#000000'
+        });
+
+        expect(el.querySelectorAll('line')).toHaveLength(0);
+    });
+
     it('reuses cached fetched history within the cache window', async () => {
         mockGetEntityAttributes.mockReturnValue(null);
         mockFetchEntityHistory.mockResolvedValue([

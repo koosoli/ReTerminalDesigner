@@ -5,32 +5,125 @@
 
 import { Logger } from '../../utils/logger.js';
 
+// Matches a YAML block scalar header value (|, |-, >, >2+, ...). Keys carrying
+// one own every following deeper-indented line, including blank lines and lines
+// that look like YAML keys, so they must never be treated as insertion anchors.
+const BLOCK_SCALAR_VALUE = /^[|>][0-9+-]*$/;
+
+/**
+ * @param {string} line
+ * @returns {number}
+ */
+function indentWidth(line) {
+    return (line.match(/^[ \t]*/) || [""])[0].length;
+}
+
+/**
+ * Fix #485: Locates the first `display:` list item structurally instead of by
+ * text matching. Regex anchors used to stop at the first blank line, which lands
+ * inside the `lambda: |-` block scalar and breaks the generated YAML.
+ * @param {string[]} lines
+ * @returns {{ propIndent: string, rotationLine: number, insertLine: number } | null}
+ */
+function locateDisplayItem(lines) {
+    const sectionStart = lines.findIndex((l) => /^display:[ \t]*(#.*)?\r?$/.test(l));
+    if (sectionStart === -1) return null;
+
+    // The section ends at the next non-blank line back at column 0.
+    let sectionEnd = lines.length;
+    for (let i = sectionStart + 1; i < lines.length; i++) {
+        if (lines[i].trim() === "") continue;
+        if (indentWidth(lines[i]) === 0) { sectionEnd = i; break; }
+    }
+
+    let itemStart = -1;
+    let itemIndent = 0;
+    for (let i = sectionStart + 1; i < sectionEnd; i++) {
+        const itemMatch = lines[i].match(/^([ \t]+)-[ \t]+\S/);
+        if (itemMatch) { itemStart = i; itemIndent = itemMatch[1].length; break; }
+    }
+    if (itemStart === -1) return null;
+
+    // Properties of the item are the lines indented deeper than the dash.
+    let propWidth = -1;
+    for (let i = itemStart + 1; i < sectionEnd; i++) {
+        if (lines[i].trim() === "") continue;
+        if (indentWidth(lines[i]) <= itemIndent) break;
+        propWidth = indentWidth(lines[i]);
+        break;
+    }
+    if (propWidth === -1) propWidth = itemIndent + 2;
+
+    let rotationLine = -1;
+    let insertLine = -1;
+    let lastPropLine = itemStart;
+
+    for (let i = itemStart + 1; i < sectionEnd; i++) {
+        const line = lines[i];
+        if (line.trim() === "") continue;
+        if (indentWidth(line) <= itemIndent) break;
+        if (indentWidth(line) !== propWidth) { lastPropLine = i; continue; }
+
+        const keyMatch = line.match(/^[ \t]*([A-Za-z0-9_]+):[ \t]*(.*)$/);
+        if (!keyMatch) { lastPropLine = i; continue; }
+
+        if (keyMatch[1] === "rotation") { rotationLine = i; break; }
+
+        if (BLOCK_SCALAR_VALUE.test(keyMatch[2].trim())) {
+            // Keep rotation above the block scalar and skip its body entirely.
+            if (insertLine === -1) insertLine = i;
+            let bodyEnd = i + 1;
+            while (bodyEnd < sectionEnd && (lines[bodyEnd].trim() === "" || indentWidth(lines[bodyEnd]) > propWidth)) {
+                bodyEnd += 1;
+            }
+            lastPropLine = bodyEnd - 1;
+            i = bodyEnd - 1;
+            continue;
+        }
+
+        lastPropLine = i;
+    }
+
+    return {
+        propIndent: " ".repeat(propWidth),
+        rotationLine,
+        insertLine: insertLine === -1 ? lastPropLine + 1 : insertLine
+    };
+}
+
+/**
+ * Reads the rotation already declared by the hardware recipe, ignoring any
+ * `rotation:` text that merely appears inside a lambda body.
+ * @param {string} yaml
+ * @returns {number}
+ */
+function getDisplayRotation(yaml) {
+    const lines = yaml.split(/\r?\n/);
+    const item = locateDisplayItem(lines);
+    if (!item || item.rotationLine === -1) return 0;
+    const valueMatch = lines[item.rotationLine].match(/:[ \t]*(\d+)/);
+    return valueMatch ? parseInt(valueMatch[1], 10) : 0;
+}
+
 /**
  * @param {string} yaml
  * @param {number} rotation
  * @returns {string}
  */
 function setDisplayRotation(yaml, rotation) {
-    const rotationRegex = /(display:[\s\S]*?rotation:\s*)\d+/;
-    if (rotationRegex.test(yaml)) {
-        return yaml.replace(rotationRegex, `$1${rotation}`);
+    const eol = yaml.includes("\r\n") ? "\r\n" : "\n";
+    const lines = yaml.split(/\r?\n/);
+    const item = locateDisplayItem(lines);
+    if (!item) return yaml;
+
+    if (item.rotationLine !== -1) {
+        // Keep any unit suffix the recipe uses (e.g. `rotation: 0°`).
+        lines[item.rotationLine] = lines[item.rotationLine].replace(/^([ \t]*rotation:[ \t]*)\d+/, `$1${rotation}`);
+    } else {
+        lines.splice(item.insertLine, 0, `${item.propIndent}rotation: ${rotation}`);
     }
 
-    const displayMatch = yaml.match(/^display:\s*\n(?<body>(?:[ \t]+.*\n?)*)/m);
-    if (!displayMatch?.groups?.body || displayMatch.index === undefined) {
-        return yaml;
-    }
-
-    const displayBodyStart = displayMatch.index + displayMatch[0].indexOf(displayMatch.groups.body);
-    const displayItemMatch = displayMatch.groups.body.match(/^(?<indent>\s*)-\s+platform:\s+[^\n]+\n(?<body>(?:\k<indent> {2,}.*\n?)*)/m);
-    if (!displayItemMatch?.groups) {
-        return yaml;
-    }
-
-    const insertAt = displayBodyStart + displayItemMatch.index + displayItemMatch[0].length;
-    const propIndent = `${displayItemMatch.groups.indent}  `;
-    const separator = insertAt > 0 && yaml[insertAt - 1] !== '\n' ? '\n' : '';
-    return `${yaml.slice(0, insertAt)}${separator}${propIndent}rotation: ${rotation}\n${yaml.slice(insertAt)}`;
+    return lines.join(eol);
 }
 
 /**
@@ -71,8 +164,7 @@ export function applyPackageOverrides(yaml, profile, orientation, isLvgl = false
         const needsOrientationSwap = isNativePortrait !== isRequestedPortrait;
 
         // Detect the base rotation already present in the hardware YAML
-        const baseRotationMatch = yaml.match(/display:[\s\S]*?rotation:\s*(\d+)/);
-        const baseRotation = baseRotationMatch ? parseInt(baseRotationMatch[1], 10) : 0;
+        const baseRotation = getDisplayRotation(yaml);
 
         // Calculate the additional rotation needed on top of the base
         // Base rotation is the hardware's default (e.g. 180 for Guition jc4827w543)

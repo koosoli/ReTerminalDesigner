@@ -1062,22 +1062,6 @@ exports[`Plugin Export Smoke Tests > Export for graph > should export LVGL with 
           "line_width": 1,
           "points": [
             {
-              "x": 25,
-              "y": 6,
-            },
-            {
-              "x": 25,
-              "y": 94,
-            },
-          ],
-        },
-      },
-      {
-        "line": {
-          "line_color": "Color(gray)",
-          "line_width": 1,
-          "points": [
-            {
               "x": 0,
               "y": 50,
             },
@@ -1094,11 +1078,27 @@ exports[`Plugin Export Smoke Tests > Export for graph > should export LVGL with 
           "line_width": 1,
           "points": [
             {
-              "x": 50,
+              "x": 0,
+              "y": 72,
+            },
+            {
+              "x": 99,
+              "y": 72,
+            },
+          ],
+        },
+      },
+      {
+        "line": {
+          "line_color": "Color(gray)",
+          "line_width": 1,
+          "points": [
+            {
+              "x": 25,
               "y": 6,
             },
             {
-              "x": 50,
+              "x": 25,
               "y": 94,
             },
           ],
@@ -1110,12 +1110,12 @@ exports[`Plugin Export Smoke Tests > Export for graph > should export LVGL with 
           "line_width": 1,
           "points": [
             {
-              "x": 0,
-              "y": 72,
+              "x": 50,
+              "y": 6,
             },
             {
-              "x": 99,
-              "y": 72,
+              "x": 50,
+              "y": 94,
             },
           ],
         },

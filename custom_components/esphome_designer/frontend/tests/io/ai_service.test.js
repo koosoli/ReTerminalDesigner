@@ -211,6 +211,23 @@ describe('ai_service', () => {
         expect(result).toEqual([{ id: 'w_1', type: 'text' }]);
     });
 
+    it('prefers the newest stable general-purpose model when auto-detecting', () => {
+        expect(AIService.pickPreferredModel([
+            { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+            { id: 'gemini-3.5-flash-image', name: 'Nano Banana' },
+            { id: 'gemini-3.5-flash-lite', name: 'Gemini 3.5 Flash Lite' },
+            { id: 'gemini-3.5-flash', name: 'Gemini 3.5 Flash' },
+            { id: 'gemini-4-flash-preview', name: 'Gemini 4 Flash Preview' }
+        ])).toBe('gemini-3.5-flash');
+
+        expect(AIService.pickPreferredModel([
+            { id: 'gemini-3.5-pro', name: 'Gemini 3.5 Pro' },
+            { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro' }
+        ])).toBe('gemini-3.5-pro');
+
+        expect(AIService.pickPreferredModel([])).toBeNull();
+    });
+
     it('throws a specific Gemini rate-limit error when the API returns 429', async () => {
         const service = new AIService();
 
@@ -281,10 +298,13 @@ describe('ai_service', () => {
         expect(mockLogger.error).toHaveBeenCalledWith('Auto-detection failed:', expect.any(Error));
         expect(service.callGemini).toHaveBeenCalledWith(
             'secret-key',
-            'gemini-2.0-flash',
+            AIService.FALLBACK_MODELS.gemini,
             expect.any(String),
             expect.any(String)
         );
+        // Models Google has already retired must never be the fallback.
+        expect(['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash'])
+            .not.toContain(AIService.FALLBACK_MODELS.gemini);
         expect(result).toEqual([{ id: 'w_2', type: 'text' }]);
     });
 });

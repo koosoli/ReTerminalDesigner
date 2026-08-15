@@ -1,6 +1,7 @@
 import { AppState } from '../core/state';
 import { Logger } from '../utils/logger.js';
 import { DEVICE_PROFILES } from './devices.js';
+import { omitSecretSettings } from '../core/stores/secrets_store.js';
 import * as yaml from 'js-yaml';
 import {
     DESIGNER_STATE_TRIGGER_MARKER,
@@ -579,7 +580,9 @@ export function loadLayoutIntoState(layout: ParsedLayout | null | undefined): vo
         'opendisplayDeviceId',
         'opendisplayEntityId', 'opendisplayDither', 'opendisplayTtl', 'glyphsets',
         'extendedLatinGlyphs', 'editor_light_mode', 'snapEnabled', 'showGrid',
-        'showDebugGrid', 'showRulers', 'gridOpacity'
+        'showDebugGrid', 'showRulers', 'gridOpacity',
+        'ai_provider', 'ai_model_filter', 'ai_model_gemini', 'ai_model_openai',
+        'ai_model_openrouter', 'ai_model_minimax', 'ai_model_glm'
     ];
 
     directSettingKeys.forEach((key) => {
@@ -592,10 +595,12 @@ export function loadLayoutIntoState(layout: ParsedLayout | null | undefined): vo
         }
     });
 
-    const mergedSettings = normalizeImportedSettings({
+    // Credentials are never imported from a layout: older exports embedded them,
+    // and a shared layout must not overwrite the local user's API keys.
+    const mergedSettings = normalizeImportedSettings(omitSecretSettings({
         ...topLevelSettings,
         ...(data.settings || {})
-    });
+    }));
 
     if (Object.keys(mergedSettings).length > 0 && AppState.updateSettings) {
         AppState.updateSettings(mergedSettings);

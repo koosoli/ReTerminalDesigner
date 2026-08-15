@@ -40,24 +40,6 @@ exports[`Export Path Round-Trip Enforcement > Data Plugins > exports "graph" plu
         // Y-axis labels are omitted because the scale is unknown at compile time.
         it.rectangle(0 + 0, 0 + 0, 200 - 2 * 0, 100 - 2 * 0, red);
         it.rectangle(0 + 1, 0 + 1, 200 - 2 * 1, 100 - 2 * 1, red);
-        for (int i = 0; i < 200; i += 4) {
-          it.draw_pixel_at(0 + i, 25, red);
-        }
-        for (int i = 0; i < 200; i += 4) {
-          it.draw_pixel_at(0 + i, 50, red);
-        }
-        for (int i = 0; i < 200; i += 4) {
-          it.draw_pixel_at(0 + i, 75, red);
-        }
-        for (int i = 0; i < 100; i += 4) {
-          it.draw_pixel_at(50, 0 + i, red);
-        }
-        for (int i = 0; i < 100; i += 4) {
-          it.draw_pixel_at(100, 0 + i, red);
-        }
-        for (int i = 0; i < 100; i += 4) {
-          it.draw_pixel_at(150, 0 + i, red);
-        }
         it.printf(0 + 0, 0 + 100 + 2, id(font_roboto_12), red, TextAlign::TOP_LEFT, "-1.0d");
         it.printf(0 + 100, 0 + 100 + 2, id(font_roboto_12), red, TextAlign::TOP_CENTER, "-12.0h");
         it.printf(0 + 200, 0 + 100 + 2, id(font_roboto_12), red, TextAlign::TOP_RIGHT, "Now");"

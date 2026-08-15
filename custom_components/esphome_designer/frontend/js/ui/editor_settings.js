@@ -353,7 +353,7 @@ export class EditorSettings {
         const aiModelSelect = this.aiModelSelect;
         if (aiModelSelect) {
             aiModelSelect.addEventListener('change', () => {
-                const provider = AppState.settings.ai_provider;
+                const provider = AppState.settings.ai_provider || "gemini";
                 AppState.updateSettings({ [`ai_model_${provider}`]: aiModelSelect.value });
             });
         }
@@ -452,12 +452,10 @@ export class EditorSettings {
 
         if (!aiService || !aiService.cache) return;
 
-        let models = aiService.cache.models[provider];
+        const models = aiService.cache.models[provider];
         if (!models) {
-            models = [];
             const apiKey = AppState.settings[`ai_api_key_${provider}`] || "";
-            models = await aiService.fetchModels(provider, apiKey);
-            aiService.cache.models[provider] = models;
+            aiService.cache.models[provider] = await aiService.fetchModels(provider, apiKey);
         }
 
         this.filterModels();
@@ -487,6 +485,17 @@ export class EditorSettings {
 
         const currentModel = AppState.settings[`ai_model_${provider}`];
         if (currentModel) {
+            // Keep the saved model selectable even when the filter (or a stale
+            // model cache) would otherwise hide it. Assigning a value that has
+            // no matching <option> silently falls back to the first entry,
+            // which is what made saved selections look like they reverted.
+            if (!filtered.some((m) => m.id === currentModel)) {
+                const known = models.find((m) => m.id === currentModel);
+                const opt = document.createElement('option');
+                opt.value = currentModel;
+                opt.textContent = known ? known.name : currentModel;
+                aiModelSelect.insertBefore(opt, aiModelSelect.firstChild);
+            }
             aiModelSelect.value = currentModel;
         }
     }

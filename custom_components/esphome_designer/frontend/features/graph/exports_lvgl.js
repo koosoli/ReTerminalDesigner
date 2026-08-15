@@ -3,6 +3,7 @@
 /** @typedef {{ line_width: number, line_rounded: boolean, line_dash_width?: number, line_dash_gap?: number }} GraphLineProps */
 
 import { clampFontWeight } from '../../js/core/font_weights.js';
+import { getGraphGridDivisions } from '../../js/utils/graph_helpers.js';
 
 /**
  * @param {GraphWidget} w
@@ -153,9 +154,20 @@ const buildLvglGridLines = (w, convertColor) => {
         return lines;
     }
 
-    for (let index = 1; index < 4; index += 1) {
-        const y = plotTop + Math.round((plotHeight * index) / 4);
-        const x = Math.round(((width - 1) * index) / 4);
+    // Honour x_grid / y_grid so "one line per day" is possible in LVGL mode too.
+    // LVGL grids are static objects, so the division count is capped for sanity.
+    const divisions = getGraphGridDivisions({
+        duration: p.duration,
+        xGrid: p.x_grid,
+        yGrid: p.y_grid,
+        minValue: p.min_value,
+        maxValue: p.max_value
+    });
+    const xDivisions = Math.min(divisions.x, 12);
+    const yDivisions = Math.min(divisions.y, 12);
+
+    for (let index = 1; index < yDivisions; index += 1) {
+        const y = plotTop + Math.round((plotHeight * index) / yDivisions);
         lines.push({
             line: {
                 line_color: gridColor,
@@ -166,6 +178,10 @@ const buildLvglGridLines = (w, convertColor) => {
                 ]
             }
         });
+    }
+
+    for (let index = 1; index < xDivisions; index += 1) {
+        const x = Math.round(((width - 1) * index) / xDivisions);
         lines.push({
             line: {
                 line_color: gridColor,

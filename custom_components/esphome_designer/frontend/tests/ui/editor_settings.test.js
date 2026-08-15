@@ -126,6 +126,8 @@ describe('EditorSettings', () => {
         vi.clearAllMocks();
         mockAiService.cache.models = {};
         mockAiService.fetchModels.mockReset();
+        mockAppState.updateSettings.mockReset();
+        mockIsDeployedInHa.mockReturnValue(false);
         mockAppState.settings.ai_provider = 'gemini';
         mockAppState.settings.ai_model_filter = '';
         mockAppState.settings.ai_api_key_gemini = 'gemini-key';
@@ -362,6 +364,87 @@ describe('EditorSettings', () => {
         directEditorSettings.applyEditorTheme(false);
         expect(document.documentElement.getAttribute('data-theme')).toBeNull();
         expect(localStorage.getItem('reterminal-editor-theme')).toBe('dark');
+    });
+
+    it('keeps a chosen Gemini model across a settings close/reopen round-trip', async () => {
+        // Regression (#484): the provider dropdown is left on its default, so
+        // ai_provider is never written to settings. The model change handler
+        // must still resolve the provider as "gemini" instead of persisting the
+        // choice under ai_model_undefined and losing it on reopen.
+        delete mockAppState.settings.ai_provider;
+        mockAppState.settings.ai_model_gemini = '';
+        mockAppState.updateSettings.mockImplementation((updates) => {
+            Object.assign(mockAppState.settings, updates);
+        });
+        mockAiService.cache.models = {
+            gemini: [
+                { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+                { id: 'gemini-3.5-flash', name: 'Gemini 3.5 Flash' },
+                { id: 'gemini-3.5-pro', name: 'Gemini 3.5 Pro' }
+            ]
+        };
+
+        const directEditorSettings = new EditorSettings();
+        directEditorSettings.init();
+        directEditorSettings.open();
+        await flushAsync();
+
+        const modelSelect = /** @type {HTMLSelectElement} */ (document.getElementById('aiModelSelect'));
+        modelSelect.value = 'gemini-3.5-pro';
+        modelSelect.dispatchEvent(new Event('change'));
+
+        expect(mockAppState.settings.ai_model_gemini).toBe('gemini-3.5-pro');
+        expect(mockAppState.settings.ai_model_undefined).toBeUndefined();
+
+        directEditorSettings.close();
+        directEditorSettings.open();
+        await flushAsync();
+
+        expect(modelSelect.value).toBe('gemini-3.5-pro');
+    });
+
+    it('applies the saved model after the model list is populated asynchronously', async () => {
+        mockAppState.settings.ai_model_gemini = 'gemini-3.5-pro';
+        mockAiService.cache.models = {};
+
+        /** @type {(models: Array<{ id: string, name: string }>) => void} */
+        let resolveModels = () => undefined;
+        mockAiService.fetchModels.mockReturnValueOnce(new Promise((resolve) => {
+            resolveModels = resolve;
+        }));
+
+        const directEditorSettings = new EditorSettings();
+        const pending = directEditorSettings.refreshModelSelect();
+
+        const modelSelect = /** @type {HTMLSelectElement} */ (document.getElementById('aiModelSelect'));
+        expect(modelSelect.options.length).toBe(0);
+
+        resolveModels([
+            { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+            { id: 'gemini-3.5-pro', name: 'Gemini 3.5 Pro' }
+        ]);
+        await pending;
+
+        expect(modelSelect.value).toBe('gemini-3.5-pro');
+    });
+
+    it('keeps the saved model selected when the filter would hide it', () => {
+        mockAppState.settings.ai_model_gemini = 'gemini-3.5-pro';
+        mockAppState.settings.ai_model_filter = 'flash';
+        mockAiService.cache.models = {
+            gemini: [
+                { id: 'gemini-3.5-flash', name: 'Gemini 3.5 Flash' },
+                { id: 'gemini-3.5-pro', name: 'Gemini 3.5 Pro' }
+            ]
+        };
+
+        const directEditorSettings = new EditorSettings();
+        directEditorSettings.filterModels();
+
+        const modelSelect = /** @type {HTMLSelectElement} */ (document.getElementById('aiModelSelect'));
+        expect(Array.from(modelSelect.options).map((option) => option.value))
+            .toEqual(['gemini-3.5-pro', 'gemini-3.5-flash']);
+        expect(modelSelect.value).toBe('gemini-3.5-pro');
     });
 
     it('toggles collapsible settings sections and logs localStorage theme failures', async () => {

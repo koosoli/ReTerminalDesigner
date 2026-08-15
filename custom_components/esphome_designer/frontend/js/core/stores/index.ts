@@ -1,7 +1,7 @@
 import { ProjectStore } from './project_store.js';
 import { EditorStore } from './editor_store';
 import { PreferencesStore } from './preferences_store.js';
-import { SecretsStore } from './secrets_store.js';
+import { SecretsStore, isSecretSettingKey, omitSecretSettings } from './secrets_store.js';
 
 import { SelectionManager } from './app_state/selection_manager.js';
 import { HistoryManager } from './app_state/history_manager.js';
@@ -214,7 +214,7 @@ export class AppStateFacade {
         const payload = {
             ...(this.project.getPagesPayload() as ProjectPayload),
             currentPageIndex: this.currentPageIndex,
-            ...this.settings
+            ...omitSecretSettings(this.settings)
         } as ProjectPayload;
 
         payload.deviceModel = this.project.deviceModel || undefined;
@@ -340,7 +340,7 @@ export class AppStateFacade {
         const prefUpdates: Record<string, any> = {};
 
         Object.keys(newSettings).forEach((key) => {
-            if (key.startsWith('ai_api_key_')) {
+            if (isSecretSettingKey(key)) {
                 secretUpdates[key] = newSettings[key];
             } else {
                 prefUpdates[key] = newSettings[key];
