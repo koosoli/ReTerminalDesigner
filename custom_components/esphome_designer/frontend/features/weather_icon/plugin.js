@@ -50,7 +50,9 @@ const exportDoc = (w, context) => {
     if (entityId) {
         const attributePath = (p.attribute || "").trim();
         const rootAttr = (attributePath.includes(".") || attributePath.includes("[")) ? attributePath.split(/[.[]/)[0] : attributePath;
-        const safeId = makeSafeId(entityId, rootAttr, "_txt");
+        // A local sensor already exists on the device, so reference it directly
+        // instead of the id generated for a Home Assistant text sensor.
+        const safeId = p.is_local_sensor ? entityId : makeSafeId(entityId, rootAttr, "_txt");
 
         // Centering logic
         const centerX = Math.round(w.x + w.width / 2);
@@ -87,6 +89,8 @@ const onExportTextSensors = (context) => {
     const weatherEntities = new Set();
     for (const w of widgets) {
         if (w.type !== "weather_icon") continue;
+        // Local sensors are declared on the device, so no HA sensor is exported.
+        if (w.props?.is_local_sensor) continue;
         const entityId = (w.entity_id || w.props?.weather_entity || "weather.forecast_home").trim();
         const attribute = (w.props?.attribute || "").trim();
         const mqttTopic = (w.props?.mqtt_topic || "").trim();

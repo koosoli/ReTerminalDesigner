@@ -54,6 +54,7 @@ export function renderWeatherIconProperties(panel, widget) {
             updateProp("size", isNaN(n) ? 48 : n);
         });
         panel.addCheckbox("Fit icon to frame", !!props.fit_icon_to_frame, (/** @type {boolean} */ v) => updateProp("fit_icon_to_frame", v));
+        panel.addCheckbox("Local / On-Device Sensor", !!props.is_local_sensor, (/** @type {boolean} */ v) => updateProp("is_local_sensor", v));
         panel.addColorSelector("Icon Color", props.color || "theme_auto", null, (/** @type {string} */ v) => updateProp("color", v));
         panel.endSection();
 
