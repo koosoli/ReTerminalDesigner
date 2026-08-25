@@ -123,7 +123,7 @@ describe('LVGL primitive plugin cluster', () => {
             opa: 'opa(100)'
         });
         expect(exported.checkbox.state.checked).toContain('id(switch_kitchen).state');
-        expect(exported.checkbox.on_value[0].if.then[0]['homeassistant.service'].data.entity_id).toBe('switch.kitchen');
+        expect(exported.checkbox.on_value[0].if.then[0]['homeassistant.action'].data.entity_id).toBe('switch.kitchen');
 
         const pendingTriggers = new Map();
         lvglCheckbox.onExportBinarySensors({
@@ -227,7 +227,7 @@ describe('LVGL primitive plugin cluster', () => {
             opa: 'opa(180)'
         });
         expect(switchExport.switch.state.checked).toContain('id(switch_fan).state');
-        expect(switchExport.switch.on_value[0].if.then[0]['homeassistant.service'].data.entity_id).toBe('switch.fan');
+        expect(switchExport.switch.on_value[0].if.then[0]['homeassistant.action'].data.entity_id).toBe('switch.fan');
 
         const switchTriggers = new Map();
         lvglSwitch.onExportBinarySensors({

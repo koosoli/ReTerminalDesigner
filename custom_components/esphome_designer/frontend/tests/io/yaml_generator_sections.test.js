@@ -169,4 +169,15 @@ describe('yaml_generator_sections', () => {
         expect(system).toContain('hardware_uart: UART0 # Use UART0 instead of USB_CDC');
         expect(system).not.toContain('hardware_uart: USB_CDC # Enable for USB debugging on S3');
     });
+
+    it('no longer boots PhotoPainter with a blank display refresh (#487)', () => {
+        const system = generateSystemSections({
+            id: 'esp32_s3_photopainter',
+            chip: 'esp32-s3',
+            features: { epaper: true }
+        }, {}).join('\n');
+
+        expect(system).toContain('AXP2101 Configured');
+        expect(system).not.toContain('#       - delay: 200ms\n#       - component.update: epaper_display');
+    });
 });

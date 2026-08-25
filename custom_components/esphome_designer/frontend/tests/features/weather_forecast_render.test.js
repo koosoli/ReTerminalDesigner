@@ -321,4 +321,59 @@ describe('weather_forecast render and properties', () => {
         expect(firstDay.children[1].innerText.codePointAt(0)).toBe(0xf0625);
         expect(el.style.border).toBe('');
     });
+
+    it('wires the weight selects and clamps weights when the font family changes (#488)', () => {
+        const handlers = {};
+        const panel = {
+            createSection: vi.fn(),
+            endSection: vi.fn(),
+            addHint: vi.fn(),
+            addDropShadowButton: vi.fn(),
+            getContainer: () => document.body,
+            addSelect: (label, _current, _options, cb) => { if (cb) handlers[label] = cb; },
+            addLabeledInput: (label, _type, _value, cb) => { if (cb) handlers[label] = cb; },
+            addCheckbox: vi.fn(),
+            addNumberWithSlider: vi.fn(),
+            addColorSelector: vi.fn(),
+            addLabeledInputWithPicker: vi.fn()
+        };
+
+        const widget = {
+            id: 'wf_props_weights',
+            props: {
+                forecast_mode: 'daily',
+                font_family: 'Roboto',
+                font_weight_day: 500,
+                font_weight_temp: 600,
+                days: 3
+            }
+        };
+        renderProperties(panel, widget);
+
+        handlers['Font Family']('Merriweather');
+        let saved = mockAppState.updateWidget.mock.calls.at(-1)[1].props;
+        expect(saved.font_family).toBe('Merriweather');
+        // 500 is not a Merriweather weight -> clamped to the nearest valid 400.
+        expect(saved.font_weight_day).toBe(400);
+        expect(saved.font_weight_temp).toBe(700);
+
+        mockAppState.updateWidget.mockClear();
+        handlers['Day Name Weight']('900');
+        saved = mockAppState.updateWidget.mock.calls.at(-1)[1].props;
+        expect(saved.font_weight_day).toBe(900);
+
+        mockAppState.updateWidget.mockClear();
+        handlers['Temp Text Weight']('300');
+        saved = mockAppState.updateWidget.mock.calls.at(-1)[1].props;
+        expect(saved.font_weight_temp).toBe(300);
+
+        const custom = { id: 'wf_props_custom', props: { forecast_mode: 'daily', font_family: 'Custom...', custom_font_family: 'MyFont' } };
+        renderProperties(panel, custom);
+        handlers['Custom Font Name']('MyFont2');
+        saved = mockAppState.updateWidget.mock.calls.at(-1)[1].props;
+        expect(saved.font_family).toBe('MyFont2');
+        expect(saved.custom_font_family).toBe('MyFont2');
+        expect(saved.font_weight_day).toBe(700);
+        expect(saved.font_weight_temp).toBe(400);
+    });
 });

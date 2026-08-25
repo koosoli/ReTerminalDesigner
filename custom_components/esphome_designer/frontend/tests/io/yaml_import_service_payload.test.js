@@ -297,4 +297,49 @@ lvgl:
             'Imported root hardware/system YAML for context; generated output may still comment those sections to avoid duplicate ESPHome definitions.'
         );
     });
+
+    it('imports homeassistant.action payloads from current ESPHome exports', () => {
+        const yamlText = `esphome:
+  name: esp32-4inch-display-01
+
+esp32:
+  variant: esp32s3
+
+lvgl:
+  id: my_lvgl
+  pages:
+    - id: page_0
+      widgets:
+        - button:
+            id: w_light_btn
+            bg_color: "0xADD8E6"
+            height: 55
+            on_click:
+              - homeassistant.action:
+                  action: light.toggle
+                  data:
+                    entity_id: light.kitchen
+            widgets:
+              - label:
+                  align: center
+                  text: "Kitchen"
+                  text_font: font_roboto_400_20
+            width: 103
+            x: 356
+            y: 22`;
+
+        const layout = parseSnippetYamlOffline(yamlText);
+        const widgets = layout?.pages?.[0]?.widgets || [];
+
+        expect(widgets).toHaveLength(1);
+        expect(widgets[0]).toMatchObject({
+            id: 'w_light_btn',
+            type: 'lvgl_button',
+            entity_id: 'light.kitchen',
+            props: {
+                text: 'Kitchen',
+                entity_id: 'light.kitchen'
+            }
+        });
+    });
 });

@@ -1,4 +1,5 @@
 import { WEATHER_ICON_CODES } from '../weather_icon/shared.js';
+import { clampFontWeight } from '../../js/core/font_weights.js';
 
 /**
  * @typedef {{
@@ -374,8 +375,8 @@ export const collectRequirements = (w, context) => {
 
     if (!addFont || !trackIcon) return;
 
-    addFont(family, 700, dayFS);
-    addFont(family, 400, tempFS);
+    addFont(family, clampFontWeight(family, p.font_weight_day || 700), dayFS);
+    addFont(family, clampFontWeight(family, p.font_weight_temp || 400), tempFS);
     addFont("Material Design Icons", 400, iconSize);
 
     WEATHER_ICON_CODES.forEach(c => trackIcon(c, iconSize));

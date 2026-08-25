@@ -1,3 +1,16 @@
+## v1.0.0 RC41 - Home Assistant Action Syntax
+**Release Date:** August 25, 2026
+
+### Fixes
+- **ESPHome `homeassistant.action` Migration (Issue #494):** Generated ESPHome YAML now uses the renamed `homeassistant.action` call (with the `action:` payload key) instead of the deprecated `homeassistant.service`/`service` form. This affects LVGL buttons, switches, checkboxes, and sliders, touch areas with a bound entity, and direct-mode touch toggles, so exported configs no longer trigger the update prompt in ESPHome Builder. Importing existing configs still accepts both the old and the new syntax.
+- **LVGL Rotation Compatibility (Issue #490):** ESPHome 2026.4 rejects a `rotation:` key in the `display:` section whenever LVGL is enabled, which broke orientation changes on the M5Stack Tab5 and every other LVGL device. LVGL exports now carry the requested orientation as an `lvgl:` `rotation:` option - which also corrects touchscreen coordinates automatically - and the display-level rotation is no longer injected in LVGL mode. Direct (non-LVGL) exports keep using display rotation.
+- **M5Stack Tab5 Backlight and Wi-Fi (Issue #490):** The Tab5 hardware package now declares its LEDC backlight on GPIO22 with a monochromatic `display_backlight` light (referenced by the LCD dimming strategy but previously missing), and `esp32_hosted` gained the required `active_high: true` flag.
+- **PhotoPainter Boot Refresh (Issue #487):** The Waveshare ESP32-S3 PhotoPainter template no longer triggers a blank full refresh from `on_boot` before Home Assistant data arrives. The PMIC power-up sequence still runs, and the first visible refresh now happens through `manage_run_and_sleep` once data is available.
+- **Weather Forecast Font Weights (Issue #488):** The Weather Forecast widget exposes "Day Name Weight" and "Temp Text Weight" settings instead of hardcoding bold day labels and thin temperatures. The weights apply to the canvas preview and to Direct, LVGL, and sensor-seeding exports, are clamped to valid weights for the selected font family, and default to the previous appearance (700/400).
+- **Release Metadata Refresh:** Updated package metadata, Home Assistant manifest version, visible header label, release notes, and rebuilt frontend assets for RC41.
+
+---
+
 ## v1.0.0 RC40 - reTerminal D1001, Rotation and Graph Grid Fixes
 **Release Date:** August 15, 2026
 

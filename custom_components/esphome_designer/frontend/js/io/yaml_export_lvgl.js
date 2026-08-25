@@ -27,6 +27,31 @@ function getTouchscreenIdForLVGL(profile) {
 }
 
 /**
+ * Computes the rotation the lvgl component must apply for the requested
+ * orientation, mirroring the display-rotation math used elsewhere.
+ * @param {Record<string, any>} profile
+ * @param {Record<string, any>} layout
+ * @returns {number}
+ */
+function resolveLvglRotation(profile, layout) {
+    const resolution = profile && profile.resolution;
+    if (!resolution || !layout) return 0;
+
+    const orientation = layout.orientation || 'landscape';
+    const isNativePortrait = resolution.height > resolution.width;
+    const isRequestedPortrait = orientation === 'portrait' || orientation === 'portrait_inverted';
+    const isRequestedInverted = orientation === 'landscape_inverted' || orientation === 'portrait_inverted';
+
+    let rotation = isNativePortrait
+        ? (isRequestedPortrait ? 0 : 90)
+        : (isRequestedPortrait ? 90 : 0);
+
+    if (isRequestedInverted) rotation = (rotation + 180) % 360;
+    if (profile.rotation_offset) rotation = (rotation + profile.rotation_offset) % 360;
+    return rotation;
+}
+
+/**
  * @param {Page[]} pages
  * @param {string} deviceModel
  * @param {Record<string, any> | null} [profileOverride]
@@ -38,7 +63,6 @@ export function generateLVGLSnippet(pages, deviceModel, profileOverride = null, 
     const lines = [];
     const profiles = /** @type {Record<string, any>} */ (DEVICE_PROFILES || {});
     const profile = profileOverride || profiles[deviceModel] || {};
-
     lines.push("# ============================================================================");
     lines.push("# LVGL Configuration");
     lines.push("# ============================================================================");
@@ -47,6 +71,14 @@ export function generateLVGLSnippet(pages, deviceModel, profileOverride = null, 
     lines.push("lvgl:");
     lines.push("  id: my_lvgl");
     lines.push("  log_level: WARN");
+
+    // Issue #490: ESPHome 2026.4 rejects `rotation:` in the display section when
+    // LVGL is enabled. Rotation is configured on the lvgl component instead,
+    // which also adjusts touch input coordinates automatically.
+    const lvglRotation = resolveLvglRotation(profile, layout);
+    if (lvglRotation !== 0) {
+        lines.push(`  rotation: ${lvglRotation}`);
+    }
 
     const isDarkMode = !!layout.darkMode;
     const bgColor = isDarkMode ? '"0x000000"' : '"0xFFFFFF"';

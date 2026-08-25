@@ -97,7 +97,7 @@ describe('lvgl slider plugin', () => {
             expect(exported.slider.max_value).toBe(90);
             expect(exported.slider.indicator.bg_color).toBe('0xGREEN');
             expect(exported.slider.knob.bg_color).toBe('0xGREEN');
-            expect(exported.slider.on_value[0]['homeassistant.service'].service).toBe(service);
+            expect(exported.slider.on_value[0]['homeassistant.action'].action).toBe(service);
         }
 
         const mediaPlayer = plugin.exportLVGL({

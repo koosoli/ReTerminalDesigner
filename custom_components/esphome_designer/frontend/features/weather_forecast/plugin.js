@@ -18,6 +18,8 @@ defaults: {
         icon_size: 32,
         temp_font_size: 14,
         day_font_size: 12,
+        font_weight_day: 700,
+        font_weight_temp: 400,
         color: "theme_auto",
         font_family: "Roboto",
         show_high_low: true,

@@ -9,7 +9,7 @@ const buildLoopGuardedToggleAction = (entityId) => ({
         condition: {
             lambda: `return x != id(${makeSafeId(entityId)}).state;`
         },
-        then: [{ "homeassistant.service": { service: "homeassistant.toggle", data: { entity_id: entityId } } }]
+        then: [{ "homeassistant.action": { action: "homeassistant.toggle", data: { entity_id: entityId } } }]
     }
 });
 

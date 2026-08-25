@@ -12,10 +12,10 @@ const buildLoopGuardedToggleAction = (entityId) => ({
         then: entityId.startsWith('lock.')
             ? [{ if: {
                 condition: { lambda: 'return x;' },
-                then: [{ "homeassistant.service": { service: "lock.lock", data: { entity_id: entityId } } }],
-                else: [{ "homeassistant.service": { service: "lock.unlock", data: { entity_id: entityId } } }]
+                then: [{ "homeassistant.action": { action: "lock.lock", data: { entity_id: entityId } } }],
+                else: [{ "homeassistant.action": { action: "lock.unlock", data: { entity_id: entityId } } }]
             } }]
-            : [{ "homeassistant.service": { service: "homeassistant.toggle", data: { entity_id: entityId } } }]
+            : [{ "homeassistant.action": { action: "homeassistant.toggle", data: { entity_id: entityId } } }]
     }
 });
 

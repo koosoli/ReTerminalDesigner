@@ -61,7 +61,7 @@ describe('LVGL binary state sync export', () => {
         expect(output.switch.on_value).toEqual([{
             if: {
                 condition: { lambda: 'return x != id(switch_kitchen_light).state;' },
-                then: [{ "homeassistant.service": { service: "homeassistant.toggle", data: { entity_id: 'switch.kitchen_light' } } }]
+                then: [{ "homeassistant.action": { action: "homeassistant.toggle", data: { entity_id: 'switch.kitchen_light' } } }]
             }
         }]);
     });
@@ -75,8 +75,8 @@ describe('LVGL binary state sync export', () => {
         }, lvglContext);
 
         const action = output.switch.on_value[0].if.then[0].if;
-        expect(action.then[0]['homeassistant.service'].service).toBe('lock.lock');
-        expect(action.else[0]['homeassistant.service'].service).toBe('lock.unlock');
+        expect(action.then[0]['homeassistant.action'].action).toBe('lock.lock');
+        expect(action.else[0]['homeassistant.action'].action).toBe('lock.unlock');
     });
 
     it('guards the checkbox toggle against state-sync feedback loops', () => {
@@ -90,7 +90,7 @@ describe('LVGL binary state sync export', () => {
         expect(output.checkbox.on_value).toEqual([{
             if: {
                 condition: { lambda: 'return x != id(input_boolean_night_mode).state;' },
-                then: [{ "homeassistant.service": { service: "homeassistant.toggle", data: { entity_id: 'input_boolean.night_mode' } } }]
+                then: [{ "homeassistant.action": { action: "homeassistant.toggle", data: { entity_id: 'input_boolean.night_mode' } } }]
             }
         }]);
     });

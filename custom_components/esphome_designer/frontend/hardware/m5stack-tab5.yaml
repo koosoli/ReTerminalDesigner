@@ -47,6 +47,7 @@ esp32:
 
 esp32_hosted:
   variant: esp32c6
+  active_high: true
   clk_pin: GPIO12
   cmd_pin: GPIO13
   d0_pin: GPIO11
@@ -57,6 +58,19 @@ esp32_hosted:
   slot: 1
 
 psram: {mode: hex, speed: 200MHz}
+
+output:
+  - platform: ledc
+    pin: GPIO22
+    id: backlight_pwm
+
+light:
+  - platform: monochromatic
+    name: "Backlight"
+    output: backlight_pwm
+    id: display_backlight
+    restore_mode: ALWAYS_ON
+    internal: true
 
 i2c:
   - {id: bsp_bus, sda: GPIO31, scl: GPIO32, frequency: 400kHz}

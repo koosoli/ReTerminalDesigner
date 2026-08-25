@@ -197,8 +197,6 @@ export function generateSystemSections(profile, layout) {
             lines.push("#           write_reg(0x95, 0x1C); // ALDO4 3.3V");
             lines.push("#           write_reg(0x90, 0x1F); // Enable rails");
             lines.push("#           ESP_LOGI(\"power\", \"AXP2101 Configured\");");
-            lines.push("#       - delay: 200ms");
-            lines.push("#       - component.update: epaper_display");
         }
 
         if (profile.battery && profile.pins && profile.pins.batteryEnable) {

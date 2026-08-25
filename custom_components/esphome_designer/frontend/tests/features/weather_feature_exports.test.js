@@ -11,6 +11,7 @@ vi.mock('@core/state', () => ({
 }));
 
 import { exportDoc as exportWeatherDoc } from '../../features/weather_forecast/export_direct.js';
+import { collectRequirements as collectWeatherRequirements } from '../../features/weather_forecast/export_sensors.js';
 import { renderWeatherIcon } from '../../features/weather_icon/render.js';
 
 describe('weather feature exports', () => {
@@ -172,5 +173,52 @@ describe('weather feature exports', () => {
         expect(output).toContain('it.filled_rectangle(10, 20, 150, 80, Color(white));');
         expect(output).toContain('it.rectangle(10 + 0, 20 + 0, 150 - 2 * 0, 80 - 2 * 0, Color(black));');
         expect(output).toContain('it.rectangle(10 + 1, 20 + 1, 150 - 2 * 1, 80 - 2 * 1, Color(black));');
+    });
+
+    it('requests the configured day and temp font weights instead of hardcoded values (#488)', () => {
+        const lines = [];
+        const addFont = vi.fn(() => 'weather_font');
+
+        exportWeatherDoc({
+            id: 'weather_weights',
+            x: 0,
+            y: 0,
+            width: 180,
+            height: 80,
+            props: {
+                forecast_mode: 'daily',
+                days: 1,
+                font_family: 'Inter',
+                font_weight_day: 500,
+                font_weight_temp: 600
+            }
+        }, {
+            lines,
+            addFont,
+            getColorConst: (value) => `Color(${value})`,
+            addDitherMask: vi.fn(),
+            getConditionCheck: () => '',
+            isEpaper: false
+        });
+
+        expect(addFont).toHaveBeenCalledWith('Inter', 500, 12);
+        expect(addFont).toHaveBeenCalledWith('Inter', 600, 14);
+
+        const tracked = [];
+        collectWeatherRequirements({
+            id: 'weather_weights_req',
+            props: {
+                font_family: 'Roboto',
+                font_weight_day: 300,
+                font_weight_temp: 900,
+                icon_size: 24
+            }
+        }, {
+            addFont: (family, weight, size) => tracked.push([family, weight, size]),
+            trackIcon: () => {}
+        });
+
+        expect(tracked).toContainEqual(['Roboto', 300, 12]);
+        expect(tracked).toContainEqual(['Roboto', 900, 14]);
     });
 });

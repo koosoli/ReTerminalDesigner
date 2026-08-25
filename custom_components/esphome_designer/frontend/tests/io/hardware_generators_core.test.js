@@ -46,7 +46,8 @@ describe('hardware_generators core', () => {
         expect(joined).toContain('display:');
         expect(joined).toContain('id: my_display');
         expect(joined).toContain('auto_clear_enabled: false');
-        expect(joined).toContain('rotation: 270');
+        // Issue #490: LVGL mode carries orientation via the lvgl component instead.
+        expect(joined).not.toContain('rotation:');
         expect(joined).toContain('update_interval: 5s');
         expect(joined).toContain('touchscreen:');
         expect(joined).toContain('platform: gt911');
@@ -214,6 +215,19 @@ describe('hardware_generators core', () => {
             orientation: 'landscape'
         }, true).join('\n');
 
+        const directConfigLines = generateDisplaySection({
+            display_config: [
+                '  - platform: ili9xxx',
+                '    model: "PanelX"',
+                '    auto_clear_enabled: true'
+            ],
+            resolution: { width: 480, height: 800 },
+            rotation_offset: 180,
+            features: { lcd: true }
+        }, {
+            orientation: 'landscape'
+        }, false).join('\n');
+
         const m5paperLines = generateDisplaySection({
             displayPlatform: 'it8951e',
             displayModel: 'M5Paper',
@@ -230,7 +244,9 @@ describe('hardware_generators core', () => {
 
         expect(configLines).toContain('id: my_display');
         expect(configLines).toContain('auto_clear_enabled: false');
-        expect(configLines).toContain('rotation: 270');
+        // Issue #490: LVGL mode carries orientation via the lvgl component instead.
+        expect(configLines).not.toContain('rotation:');
+        expect(directConfigLines).toContain('rotation: 270');
         expect(m5paperLines).toContain('reversed: false');
         expect(m5paperLines).toContain('reset_duration: 200ms');
         expect(reterminalLines).toContain('Please update your ESPHome version to 2025.11.1 above');

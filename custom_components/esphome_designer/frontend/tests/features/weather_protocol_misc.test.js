@@ -295,4 +295,29 @@ describe('weather protocol misc coverage', () => {
             anchor: 'lt'
         });
     });
+
+    it('applies configured font weights to LVGL forecast labels (#488)', () => {
+        const lvgl = exportForecastLVGL({
+            id: 'forecast_weights_lvgl',
+            x: 0,
+            y: 0,
+            width: 180,
+            height: 80,
+            props: {
+                forecast_mode: 'daily',
+                days: 1,
+                font_family: 'Inter',
+                font_weight_day: 800,
+                font_weight_temp: 300
+            }
+        }, {
+            common: { id: 'forecast_weights_root' },
+            convertColor: (value) => `COLOR_${String(value).toUpperCase()}`,
+            getLVGLFont: (...args) => args.join('_')
+        });
+
+        const labels = lvgl.obj.widgets[0].obj.widgets.map((entry) => entry.label.text_font);
+        expect(labels).toContain('Inter_12_800');
+        expect(labels).toContain('Inter_14_300');
+    });
 });

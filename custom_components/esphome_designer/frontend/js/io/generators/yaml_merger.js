@@ -177,8 +177,16 @@ export function applyPackageOverrides(yaml, profile, orientation, isLvgl = false
 
         Logger.log(`[Adapter] Orientation: ${orientation}, base rotation: ${baseRotation}, offset: ${rotationOffset}, final: ${rotation}`);
 
-        // Apply rotation to YAML, including package templates that omit it by default.
-        yaml = setDisplayRotation(yaml, rotation);
+        // Issue #490: Since ESPHome 2026.4, a `rotation:` key in the display
+        // section is rejected when LVGL is enabled ("not compatible with LVGL").
+        // In LVGL mode orientation is applied through the lvgl: rotation option
+        // instead, which also corrects touchscreen coordinates automatically.
+        if (isLvgl) {
+            Logger.log("[Adapter] LVGL rendering active: skipping display-level 'rotation:' injection");
+        } else {
+            // Apply rotation to YAML, including package templates that omit it by default.
+            yaml = setDisplayRotation(yaml, rotation);
+        }
 
         // Note: Do NOT swap width/height in the dimensions block.
         // The dimensions: block describes the physical panel hardware specs.

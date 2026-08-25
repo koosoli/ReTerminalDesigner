@@ -84,7 +84,7 @@ describe('hardware_generators_inputs', () => {
         expect(joined).toContain('id: nav_next_nav_main');
         expect(joined).toContain("lambda: 'return id(display_page) == 1 && (millis() - id(last_touch_time) > 2000);'");
         expect(joined).toContain('script.execute: manage_run_and_sleep');
-        expect(joined).toContain('service: homeassistant.toggle');
+        expect(joined).toContain('action: homeassistant.toggle');
         expect(joined).toContain('entity_id: light.kitchen');
     });
 

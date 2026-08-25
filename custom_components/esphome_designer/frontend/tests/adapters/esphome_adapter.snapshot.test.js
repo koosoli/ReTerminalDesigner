@@ -110,7 +110,8 @@ touchscreen:
 
       const result = applyPackageOverrides(yaml, profile, 'portrait', true, { lcdEcoStrategy: 'dim_after_timeout' });
 
-      expect(result).toContain('rotation: 90');
+      // Issue #490: LVGL mode must not inject a display-level rotation.
+      expect(result).not.toContain('rotation: 90');
       expect(result).toContain('transform:');
       expect(result).toContain('swap_xy: true');
       expect(result).toContain('mirror_x: false');

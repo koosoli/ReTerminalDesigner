@@ -173,10 +173,10 @@ export function parseDisplayBlocks(lambdaLines, rawLines, deviceSettings, getESP
         if (!value || typeof value !== "object") return calls;
 
         const record = /** @type {Record<string, any>} */ (value);
-        const servicePayload = record["homeassistant.service"];
+        const servicePayload = record["homeassistant.action"] || record["homeassistant.service"];
         if (servicePayload && typeof servicePayload === "object") {
             const payload = /** @type {Record<string, any>} */ (servicePayload);
-            const service = String(payload.service || "").trim();
+            const service = String(payload.action || payload.service || "").trim();
             const entityId = String(
                 payload.entity_id
                 || payload.data?.entity_id

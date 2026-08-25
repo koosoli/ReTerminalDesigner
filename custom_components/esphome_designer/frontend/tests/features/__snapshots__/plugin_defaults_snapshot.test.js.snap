@@ -1025,6 +1025,8 @@ exports[`Plugin Defaults Snapshots > should match snapshot for defaults of weath
   "day_font_size": 12,
   "days": 5,
   "font_family": "Roboto",
+  "font_weight_day": 700,
+  "font_weight_temp": 400,
   "forecast_mode": "daily",
   "height": 90,
   "hourly_mode": "fixed",

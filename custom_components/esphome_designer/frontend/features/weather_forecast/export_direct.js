@@ -1,4 +1,5 @@
 import { getDayLabelSet } from './day_labels.js';
+import { clampFontWeight } from '../../js/core/font_weights.js';
 import { UNKNOWN_WEATHER_ICON } from '../weather_icon/shared.js';
 
 /** @typedef {Widget & { props?: Record<string, any>, entity_id?: string }} WeatherForecastWidget */
@@ -36,8 +37,8 @@ export const exportDoc = (w, context) => {
     const unitSymbol = tempUnit === "F" ? "°F" : "°C";
     const precision = (typeof p.precision === 'number' && !isNaN(p.precision)) ? p.precision : 1;
 
-    const dayFontId = addFont(fontFamily, 700, dayFontSize);
-    const tempFontId = addFont(fontFamily, 400, tempFontSize);
+    const dayFontId = addFont(fontFamily, clampFontWeight(fontFamily, p.font_weight_day || 700), dayFontSize);
+    const tempFontId = addFont(fontFamily, clampFontWeight(fontFamily, p.font_weight_temp || 400), tempFontSize);
     const iconFontId = addFont("Material Design Icons", 400, iconSize);
 
     const condFore = getConditionCheck(w);

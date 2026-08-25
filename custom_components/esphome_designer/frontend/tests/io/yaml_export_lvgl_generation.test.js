@@ -66,6 +66,22 @@ describe('yaml_export_lvgl generation details', () => {
         expect(output).not.toContain('group_1');
     });
 
+    it('carries the requested orientation as an lvgl rotation option (#490)', () => {
+        const profile = { features: { lcd: true }, resolution: { width: 1280, height: 720 } };
+
+        const portrait = generateLVGLSnippet([], 'test_device', profile, { orientation: 'portrait' }).join('\n');
+        expect(portrait).toContain('\n  rotation: 90\n');
+
+        const inverted = generateLVGLSnippet([], 'test_device', profile, { orientation: 'landscape_inverted' }).join('\n');
+        expect(inverted).toContain('\n  rotation: 180\n');
+
+        const offset = generateLVGLSnippet([], 'test_device', { ...profile, rotation_offset: 180 }, { orientation: 'landscape' }).join('\n');
+        expect(offset).toContain('\n  rotation: 180\n');
+
+        const landscape = generateLVGLSnippet([], 'test_device', profile, { orientation: 'landscape' }).join('\n');
+        expect(landscape).not.toContain('rotation:');
+    });
+
     it('falls back to epaper display ids and emits empty page arrays', () => {
         const lines = generateLVGLSnippet(
             [

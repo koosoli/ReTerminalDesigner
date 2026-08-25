@@ -94,22 +94,22 @@ const exportLVGL = (w, { common, convertColor, formatOpacity, _profile, getLVGLF
             const service = serviceOverride === "button.press"
                 ? getButtonPressService(entityId)
                 : serviceOverride;
-            action = [{ "homeassistant.service": { service, data: { entity_id: entityId } } }];
+            action = [{ "homeassistant.action": { action: service, data: { entity_id: entityId } } }];
         } else {
             // Auto-detect based on entity prefix
             if (entityId.startsWith("switch.") || entityId.startsWith("light.") || entityId.startsWith("fan.") || entityId.startsWith("input_boolean.")) {
-                action = [{ "homeassistant.service": { service: "homeassistant.toggle", data: { entity_id: entityId } } }];
+                action = [{ "homeassistant.action": { action: "homeassistant.toggle", data: { entity_id: entityId } } }];
             } else if (entityId.startsWith("script.")) {
                 action = [{ "script.execute": entityId }];
             } else if (entityId.startsWith("button.") || entityId.startsWith("input_button.")) {
-                action = [{ "homeassistant.service": { service: getButtonPressService(entityId), data: { entity_id: entityId } } }];
+                action = [{ "homeassistant.action": { action: getButtonPressService(entityId), data: { entity_id: entityId } } }];
             } else if (entityId.startsWith("scene.")) {
                 action = [{ "scene.turn_on": entityId }];
             } else if (entityId.startsWith("cover.")) {
-                action = [{ "homeassistant.service": { service: "cover.toggle", data: { entity_id: entityId } } }];
+                action = [{ "homeassistant.action": { action: "cover.toggle", data: { entity_id: entityId } } }];
             } else {
                 // Default to toggle for unknown domains if it looks like an entity ID
-                action = [{ "homeassistant.service": { service: "homeassistant.toggle", data: { entity_id: entityId } } }];
+                action = [{ "homeassistant.action": { action: "homeassistant.toggle", data: { entity_id: entityId } } }];
             }
         }
         btnObj.button.on_click = action;

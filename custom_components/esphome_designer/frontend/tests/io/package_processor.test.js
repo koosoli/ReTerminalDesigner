@@ -3,6 +3,7 @@ import jsyaml from 'js-yaml';
 import { processPackageContent, sanitizePackageContent } from '../../js/io/adapters/package_processor.js';
 import geekMagicMiniYaml from '../../hardware/geekmagic-mini-esp8266.yaml?raw';
 import guitionP4LargeYaml from '../../hardware/guition-esp32-p4-jc8012p4a1c.yaml?raw';
+import m5stackTab5Yaml from '../../hardware/m5stack-tab5.yaml?raw';
 import waveshareEpaperYaml from '../../hardware/waveshare-esp32-universal-epaper-7.5v2.yaml?raw';
 
 describe('Package Processor', () => {
@@ -187,7 +188,7 @@ display:
         [],
         { isPackageBased: true, resolution: { width: 480, height: 480 } },
         { orientation: 'portrait' },
-        true,
+        false,
         []
       );
 
@@ -273,6 +274,51 @@ display:
         });
       });
     }
+  });
+
+  // Issue #490: ESPHome 2026.4 rejects `rotation:` in the display section when
+  // LVGL is enabled. In LVGL mode the merger must not inject it; orientation
+  // moves to the lvgl component config instead.
+  describe('LVGL-safe rotation handling (#490)', () => {
+    const stripComments = (yaml) => yaml.split('\n').filter((l) => !l.trimStart().startsWith('#')).join('\n');
+
+    it('leaves the M5Stack Tab5 display block free of a rotation key in LVGL mode', () => {
+      for (const orientation of ['landscape', 'portrait', 'landscape_inverted', 'portrait_inverted']) {
+        const result = processPackageContent(
+          m5stackTab5Yaml,
+          ['it.print(0, 0, id(font1), "Hello");'],
+          [],
+          { id: 'm5stack_tab5', isPackageBased: true, displayPlatform: 'mipi_dsi', resolution: { width: 1280, height: 720 } },
+          { orientation },
+          true,
+          []
+        );
+
+        const doc = jsyaml.load(stripComments(result));
+        expect(doc.display[0].rotation).toBeUndefined();
+        expect(result).not.toMatch(/^\s*rotation:/m);
+      }
+    });
+
+    it('keeps injecting display rotation for direct-mode rendering', () => {
+      const result = processPackageContent(
+        geekMagicMiniYaml,
+        ['it.print(0, 0, id(font1), "Hello");'],
+        [],
+        { isPackageBased: true, resolution: { width: 240, height: 240 } },
+        { orientation: 'portrait' },
+        false,
+        []
+      );
+      const doc = jsyaml.load(stripComments(result));
+      expect(doc.display[0].rotation).toBe(90);
+    });
+
+    it('ships the Tab5 esp32_hosted active_high flag and a display_backlight light (#490)', () => {
+      expect(m5stackTab5Yaml).toMatch(/esp32_hosted:\n(?: {2}.*\n)* {2}active_high: true/);
+      expect(m5stackTab5Yaml).toContain('id: backlight_pwm');
+      expect(m5stackTab5Yaml).toMatch(/light:\n(?: {2}.*\n)* {4}id: display_backlight/);
+    });
   });
 
 });

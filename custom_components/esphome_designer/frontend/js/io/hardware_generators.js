@@ -219,7 +219,9 @@ export function generateDisplaySection(profile, layout = {}, isLvgl = false) {
         }
 
         // Inject the calculated rotation (ensures Designer 'Landscape/Portrait' toggle works)
-        lines.push(`    rotation: ${displayRotation}`);
+        // Issue #490: ESPHome 2026.4 rejects display-level rotation when LVGL is
+        // enabled; the lvgl component carries the rotation in that mode instead.
+        if (!isLvgl) lines.push(`    rotation: ${displayRotation}`);
         lines.push("");
     } else {
         const isLcd = !!(profile.features && (profile.features.lcd || profile.features.oled));
@@ -253,7 +255,8 @@ export function generateDisplaySection(profile, layout = {}, isLvgl = false) {
         }
 
 
-        lines.push(`    rotation: ${displayRotation}`);
+        // Issue #490: skip display-level rotation in LVGL mode (handled by lvgl:).
+        if (!isLvgl) lines.push(`    rotation: ${displayRotation}`);
         // M5Paper / IT8951 needs specific reset durations
         if (profile.displayModel === "M5Paper" || profile.displayPlatform === "it8951e") {
             lines.push("    reversed: false");

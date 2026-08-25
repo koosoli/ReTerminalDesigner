@@ -1,4 +1,5 @@
 import { AppState } from '@core/state';
+import { getWeightsForFont, clampFontWeight } from '../../js/core/font_weights.js';
 import { DAY_LANGUAGE_OPTIONS, DEFAULT_DAY_LANGUAGE } from './day_labels.js';
 
 /** @typedef {Widget & { props?: Record<string, any>, entity_id?: string }} WeatherForecastWidget */
@@ -289,8 +290,12 @@ template:
 
     panel.addSelect("Font Family", isCustom ? "Custom..." : currentFont, fontOptions, (/** @type {string} */ value) => {
         if (value !== "Custom...") {
-            updateProp("font_family", value);
-            updateProp("custom_font_family", "");
+            const newProps = { ...props };
+            newProps.font_family = value;
+            newProps.custom_font_family = "";
+            newProps.font_weight_day = clampFontWeight(value, newProps.font_weight_day || 700);
+            newProps.font_weight_temp = clampFontWeight(value, newProps.font_weight_temp || 400);
+            AppState.updateWidget(widget.id, { props: newProps });
         } else {
             updateProp("font_family", "Custom...");
         }
@@ -298,12 +303,19 @@ template:
 
     if (isCustom || props.font_family === "Custom...") {
         panel.addLabeledInput("Custom Font Name", "text", props.custom_font_family || (isCustom ? currentFont : ""), (/** @type {string} */ value) => {
-            updateProp("font_family", value || "Roboto");
-            updateProp("custom_font_family", value);
+            const newProps = { ...props };
+            newProps.font_family = value || "Roboto";
+            newProps.custom_font_family = value;
+            newProps.font_weight_day = clampFontWeight(newProps.font_family, newProps.font_weight_day || 700);
+            newProps.font_weight_temp = clampFontWeight(newProps.font_family, newProps.font_weight_temp || 400);
+            AppState.updateWidget(widget.id, { props: newProps });
         });
         panel.addHint('Browse <a href="https://fonts.google.com" target="_blank">fonts.google.com</a>');
     }
 
+    const validWeights = getWeightsForFont(props.font_family || "Roboto");
+    panel.addSelect("Day Name Weight", props.font_weight_day || 700, validWeights, setIntProp("font_weight_day"));
+    panel.addSelect("Temp Text Weight", props.font_weight_temp || 400, validWeights, setIntProp("font_weight_temp"));
     panel.addLabeledInput("Day Name Size", "number", props.day_font_size || 12, setIntProp("day_font_size"));
     panel.addLabeledInput("Temp Text Size", "number", props.temp_font_size || 14, setIntProp("temp_font_size"));
     panel.endSection();

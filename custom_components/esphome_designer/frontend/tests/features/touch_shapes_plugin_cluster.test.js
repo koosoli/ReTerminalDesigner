@@ -146,7 +146,7 @@ describe('touch and shape plugin cluster', () => {
         expect(joined).toContain('target_page: !lambda \'return id(display_page) + 1;\'');
         expect(joined).toContain('id: change_page_to');
         expect(joined).toContain('script.execute: manage_run_and_sleep');
-        expect(joined).toContain('service: homeassistant.toggle');
+        expect(joined).toContain('action: homeassistant.toggle');
     });
 
     it('renders and exports circular and rounded shapes with resolved colors', () => {

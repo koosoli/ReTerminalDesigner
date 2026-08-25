@@ -215,15 +215,15 @@ const exportLVGL = (w, { common, convertColor, profile }) => {
                 }
             };
         } else if (normalizedEntityId.startsWith("fan.")) {
-            serviceCall = { "homeassistant.service": { service: "fan.set_percentage", data: { entity_id: entityId, percentage: "!lambda 'return x;'" } } };
+            serviceCall = { "homeassistant.action": { action: "fan.set_percentage", data: { entity_id: entityId, percentage: "!lambda 'return x;'" } } };
         } else if (normalizedEntityId.startsWith("cover.")) {
-            serviceCall = { "homeassistant.service": { service: "cover.set_cover_position", data: { entity_id: entityId, position: "!lambda 'return x;'" } } };
+            serviceCall = { "homeassistant.action": { action: "cover.set_cover_position", data: { entity_id: entityId, position: "!lambda 'return x;'" } } };
         } else if (normalizedEntityId.startsWith("media_player.")) {
             serviceCall = { "homeassistant.action": { action: "media_player.volume_set", data: { entity_id: entityId, volume_level: "!lambda 'return x / 100.0;'" } } };
         } else if (normalizedEntityId.startsWith("climate.")) {
-            serviceCall = { "homeassistant.service": { service: "climate.set_temperature", data: { entity_id: entityId, temperature: "!lambda 'return x;'" } } };
+            serviceCall = { "homeassistant.action": { action: "climate.set_temperature", data: { entity_id: entityId, temperature: "!lambda 'return x;'" } } };
         } else {
-            serviceCall = { "homeassistant.service": { service: "number.set_value", data: { entity_id: entityId, value: "!lambda 'return x;'" } } };
+            serviceCall = { "homeassistant.action": { action: "number.set_value", data: { entity_id: entityId, value: "!lambda 'return x;'" } } };
         }
         if (isLightEntity(entityId)) {
             sliderObj.slider.on_release = [serviceCall];

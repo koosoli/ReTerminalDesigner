@@ -133,7 +133,7 @@ export const render = (el, widget, { getColorStyle }) => {
 
         const dayLabel = document.createElement("div");
         dayLabel.style.fontSize = `${dayFontSize}px`;
-        dayLabel.style.fontWeight = "400";
+        dayLabel.style.fontWeight = String(props.font_weight_day || 700);
         dayLabel.style.marginBottom = "2px";
 
         if (mode === "hourly") {
@@ -166,7 +166,7 @@ export const render = (el, widget, { getColorStyle }) => {
 
         const tempDiv = document.createElement("div");
         tempDiv.style.fontSize = `${tempFontSize}px`;
-        tempDiv.style.fontWeight = "400";
+        tempDiv.style.fontWeight = String(props.font_weight_temp || 400);
 
         const hasLiveHigh = typeof liveHigh === "number" && !Number.isNaN(liveHigh);
         const hasLiveLow = typeof liveLow === "number" && !Number.isNaN(liveLow);

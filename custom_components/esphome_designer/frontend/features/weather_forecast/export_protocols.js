@@ -1,4 +1,5 @@
 import { getDayLabelSet } from './day_labels.js';
+import { clampFontWeight } from '../../js/core/font_weights.js';
 import {
     UNKNOWN_WEATHER_ICON,
     WEATHER_ICON_OPTIONS
@@ -27,6 +28,9 @@ export const exportLVGL = (w, { common, convertColor, getLVGLFont }) => {
     const dayFS = parseInt(p.day_font_size || 12, 10);
     const iconS = parseInt(p.icon_size || 32, 10);
     const tempFS = parseInt(p.temp_font_size || 14, 10);
+    const fontFamily = p.font_family || "Roboto";
+    const dayWeight = clampFontWeight(fontFamily, p.font_weight_day || 700);
+    const tempWeight = clampFontWeight(fontFamily, p.font_weight_temp || 400);
     const showHighLow = mode === "hourly" ? false : p.show_high_low !== false;
     const precision = (typeof p.precision === 'number' && !isNaN(p.precision)) ? p.precision : 1;
 
@@ -71,7 +75,7 @@ export const exportLVGL = (w, { common, convertColor, getLVGLFont }) => {
                     id: `${w.id}_day${i}`.replace(/-/g, '_'),
                     align: "top_mid",
                     text: dayNameLambda,
-                    text_font: getLVGLFont(p.font_family || "Roboto", dayFS, 700),
+                    text_font: getLVGLFont(fontFamily, dayFS, dayWeight),
                     text_color: color
                 }
             },
@@ -90,7 +94,7 @@ export const exportLVGL = (w, { common, convertColor, getLVGLFont }) => {
                     id: `${w.id}_temp${i}`.replace(/-/g, '_'),
                     align: "bottom_mid",
                     text: tempTextLambda,
-                    text_font: getLVGLFont(p.font_family || "Roboto", tempFS, 400),
+                    text_font: getLVGLFont(fontFamily, tempFS, tempWeight),
                     text_color: color
                 }
             }

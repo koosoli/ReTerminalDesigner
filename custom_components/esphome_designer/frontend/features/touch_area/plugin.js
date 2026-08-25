@@ -162,8 +162,8 @@ const onExportBinarySensors = (context) => {
             } else if (navAction === "reload_page") {
                 lines.push(`          - script.execute: manage_run_and_sleep`);
             } else if (w.entity_id) {
-                lines.push(`          - homeassistant.service:`);
-                lines.push(`              service: homeassistant.toggle`);
+                lines.push(`          - homeassistant.action:`);
+                lines.push(`              action: homeassistant.toggle`);
                 lines.push(`              data:`);
                 lines.push(`                entity_id: ${w.entity_id}`);
             }

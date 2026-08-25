@@ -18,7 +18,7 @@ describe('lvgl_button service selection', () => {
             props: { service: "auto" }
         };
         const result = plugin.exportLVGL(widget, context);
-        expect(result.button.on_click[0]["homeassistant.service"].service).toBe("cover.toggle");
+        expect(result.button.on_click[0]["homeassistant.action"].action).toBe("cover.toggle");
     });
 
     it('respects service override for cover.close_cover', () => {
@@ -29,7 +29,7 @@ describe('lvgl_button service selection', () => {
             props: { service: "cover.close_cover" }
         };
         const result = plugin.exportLVGL(widget, context);
-        expect(result.button.on_click[0]["homeassistant.service"].service).toBe("cover.close_cover");
+        expect(result.button.on_click[0]["homeassistant.action"].action).toBe("cover.close_cover");
     });
 
     it('respects service override for script.execute', () => {
@@ -40,7 +40,7 @@ describe('lvgl_button service selection', () => {
             props: { service: "script.execute" }
         };
         const result = plugin.exportLVGL(widget, context);
-        expect(result.button.on_click[0]["homeassistant.service"].service).toBe("script.execute");
+        expect(result.button.on_click[0]["homeassistant.action"].action).toBe("script.execute");
     });
 
     it('auto-detects script entities and uses script.execute payloads', () => {
@@ -63,7 +63,7 @@ describe('lvgl_button service selection', () => {
             props: { service: "auto" }
         };
         const result = plugin.exportLVGL(widget, context);
-        expect(result.button.on_click[0]["homeassistant.service"].service).toBe("homeassistant.toggle");
+        expect(result.button.on_click[0]["homeassistant.action"].action).toBe("homeassistant.toggle");
     });
 
     it('renders preview text with italic styling and border color', () => {
@@ -108,7 +108,7 @@ describe('lvgl_button service selection', () => {
             entity_id: 'button.doorbell',
             props: { service: 'auto' }
         }, context);
-        expect(button.button.on_click[0]['homeassistant.service'].service).toBe('button.press');
+        expect(button.button.on_click[0]['homeassistant.action'].action).toBe('button.press');
 
         const noEntity = plugin.exportLVGL({
             id: 'button_empty',
@@ -126,7 +126,7 @@ describe('lvgl_button service selection', () => {
             entity_id: 'input_button.trigger_sleep_flow',
             props: { service: 'auto' }
         }, context);
-        expect(auto.button.on_click[0]['homeassistant.service'].service).toBe('input_button.press');
+        expect(auto.button.on_click[0]['homeassistant.action'].action).toBe('input_button.press');
 
         const buttonOverride = plugin.exportLVGL({
             id: 'input_button_override',
@@ -134,7 +134,7 @@ describe('lvgl_button service selection', () => {
             entity_id: 'input_button.trigger_sleep_flow',
             props: { service: 'button.press' }
         }, context);
-        expect(buttonOverride.button.on_click[0]['homeassistant.service'].service).toBe('input_button.press');
+        expect(buttonOverride.button.on_click[0]['homeassistant.action'].action).toBe('input_button.press');
     });
 
     it('can mirror binary Home Assistant state onto checkable buttons', () => {
@@ -151,7 +151,7 @@ describe('lvgl_button service selection', () => {
 
         expect(result.button.checkable).toBe(true);
         expect(result.button.state.checked).toBe('!lambda return id(switch_kitchen_light).state;');
-        expect(result.button.on_click[0]['homeassistant.service'].service).toBe('homeassistant.toggle');
+        expect(result.button.on_click[0]['homeassistant.action'].action).toBe('homeassistant.toggle');
     });
 
     it('does not attach checked-state sync for non-binary domains', () => {
