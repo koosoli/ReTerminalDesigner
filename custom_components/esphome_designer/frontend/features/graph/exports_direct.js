@@ -58,7 +58,7 @@ export const exportDoc = (w, context) => {
     if (cond) lines.push(`        ${cond}`);
 
     if (bgColor) {
-        lines.push(`        it.fill_rectangle(${w.x}, ${w.y}, ${w.width}, ${w.height}, ${bgColor});`);
+        lines.push(`        it.filled_rectangle(${w.x}, ${w.y}, ${w.width}, ${w.height}, ${bgColor});`);
     }
 
     if (entityId) {

@@ -79,7 +79,7 @@ describe('graph exports_direct', () => {
 
         const output = context.lines.join('\n');
         expect(output).toContain('if (id(graph_enabled)) {');
-        expect(output).toContain('it.fill_rectangle(0, 0, 100, 40, Color(white));');
+        expect(output).toContain('it.filled_rectangle(0, 0, 100, 40, Color(white));');
         expect(output).toContain('float g_pad = (g_max - g_min) * 0.05;');
         expect(output).toContain('int hist_count = id(hist_graph_2_count);');
         expect(output).toContain('it.line(x1, y1+1, x2, y2+1, Color(red));');
