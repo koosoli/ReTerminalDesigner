@@ -652,6 +652,87 @@ export const DEVICE_PROFILES = {
       "  - source: github://Passific/m5paper_esphome"
     ]
   },
+  m5stack_paper_mono: {
+    id: "m5stack_paper_mono",
+    name: "M5Stack PaperMono",
+    isUntestedProfile: true,
+    // 3.97" 480x800 monochrome e-paper (SSD1677), launched Aug 2026.
+    // Display reset and power rail are NOT direct GPIOs: they hang off the
+    // M5IOE1 IO expander (@0x4F) and must be configured through the m5stack
+    // external component below. Battery %, frontlight, and deep sleep run
+    // through the M5PM1 PMIC which has no ESPHome component yet.
+    displayType: "grayscale",
+    displayModel: "ssd1677",
+    displayPlatform: "epaper_spi",
+    resolution: { width: 480, height: 800 },
+    shape: "rect",
+    chip: "esp32-s3",
+    board: "esp32-s3-devkitc-1",
+    psram_mode: "octal",
+    frameworkHint: "ESP-IDF (Required)",
+    display_config: [
+      "  - platform: epaper_spi",
+      "    model: ssd1677",
+      "    cs_pin: GPIO16",
+      "    dc_pin: GPIO17",
+      "    busy_pin: GPIO18",
+      "    reset_pin:",
+      "      m5ioe1_id: m5ioe1_hub",
+      "      number: 4",
+      "      mode:",
+      "        output: true",
+      "    dimensions:",
+      "      width: 480",
+      "      height: 800",
+      "    update_interval: never"
+    ],
+    external_components: [
+      "  - source:",
+      "      type: git",
+      "      url: https://github.com/m5stack/esphome-yaml",
+      "    components: [ m5ioe1 ]"
+    ],
+    extra_components: [
+      "m5ioe1:",
+      "  id: m5ioe1_hub",
+      "  address: 0x4F",
+      "",
+      "# EPD 3.3V rail enable (M5IOE1 PYG3). Must be ON before the panel initializes.",
+      "switch:",
+      "  - platform: gpio",
+      "    id: epd_power_enable",
+      "    name: \"EPD Power\"",
+      "    internal: true",
+      "    restore_mode: ALWAYS_ON",
+      "    pin:",
+      "      m5ioe1_id: m5ioe1_hub",
+      "      number: 2",
+      "      mode:",
+      "        output: true"
+    ],
+    pins: {
+      display: { cs: null, dc: null, reset: null, busy: null },
+      i2c: { sda: "GPIO47", scl: "GPIO48" }, // Shared with M5PM1/M5IOE1/RX8130/FT6336
+      spi: { clk: "GPIO15", mosi: "GPIO14" },
+      batteryEnable: null,
+      batteryAdc: null, // Battery sensing is inside the M5PM1 PMIC (no public component yet)
+      buzzer: "GPIO42",
+      buttons: { left: "GPIO2", right: "GPIO3" } // KEY1/KEY2, active-low
+    },
+    features: {
+      psram: true,
+      buzzer: true,
+      buttons: true,
+      lcd: false,
+      epaper: true,
+      touch: true
+    },
+    touch: {
+      platform: "ft6336u", // FT6336G @ 0x38 (component default)
+      i2c_id: "bus_a",
+      interrupt_pin: "GPIO4"
+    }
+  },
   lilygo_t5_47: {
     id: "lilygo_t5_47",
     name: "Lilygo T5 4.7\" E-Paper",

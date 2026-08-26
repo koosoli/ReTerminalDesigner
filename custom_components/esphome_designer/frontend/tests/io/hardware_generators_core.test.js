@@ -12,6 +12,7 @@ import {
     generateRTTTLSection,
     generateSPISection
 } from '../../js/io/hardware_generators.js';
+import { DEVICE_PROFILES } from '../../js/io/devices.js';
 
 describe('hardware_generators core', () => {
     it('builds touchscreen-aware display sections with LVGL wake hooks and transform metadata', () => {
@@ -290,5 +291,36 @@ describe('hardware_generators core', () => {
         expect(switchBacklight).toContain('pin: GPIO14');
         expect(epaperLines).toContain('full_update_every: 30');
         expect(epaperLines).toContain('update_interval: never');
+    });
+
+    it('generates the M5Stack PaperMono display, expander, and touch sections', () => {
+        const profile = DEVICE_PROFILES.m5stack_paper_mono;
+        expect(profile.isUntestedProfile).toBe(true);
+
+        const lvglDisplay = generateDisplaySection(profile, { orientation: 'landscape' }, true).join('\n');
+        expect(lvglDisplay).toContain('model: ssd1677');
+        expect(lvglDisplay).toContain('cs_pin: GPIO16');
+        expect(lvglDisplay).toContain('busy_pin: GPIO18');
+        // Display reset hangs off the M5IOE1 expander, not a direct GPIO
+        expect(lvglDisplay).toContain('m5ioe1_id: m5ioe1_hub');
+        expect(lvglDisplay).toContain('width: 480');
+        expect(lvglDisplay).toContain('height: 800');
+        expect(lvglDisplay).not.toContain('rotation:');
+        expect(lvglDisplay).toContain('platform: ft6336u');
+        expect(lvglDisplay).toContain('interrupt_pin: GPIO4');
+
+        const directDisplay = generateDisplaySection(profile, { orientation: 'portrait' }, false).join('\n');
+        expect(directDisplay).toContain('rotation: 0');
+
+        const extras = generateExtraComponents(profile).join('\n');
+        expect(extras).toContain('components: [ m5ioe1 ]');
+        expect(extras).toContain('address: 0x4F');
+        expect(extras).toContain('id: epd_power_enable');
+
+        const psram = generatePSRAMSection(profile).join('\n');
+        expect(psram).toContain('mode: octal');
+
+        const i2c = generateI2CSection(profile).join('\n');
+        expect(i2c).toContain('sda: GPIO47');
     });
 });

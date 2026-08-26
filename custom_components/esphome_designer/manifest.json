@@ -1,1 +1,23 @@
-{  "domain": "esphome_designer",  "name": "ESPHome Designer",  "after_dependencies": [    "http",    "frontend",    "panel_custom",    "recorder"  ],  "codeowners": [    "@koosoli"  ],  "config_flow": true,  "documentation": "https://github.com/koosoli/ESPHomeDesigner",  "integration_type": "hub",  "iot_class": "local_push",  "issue_tracker": "https://github.com/koosoli/ESPHomeDesigner/issues",  "loggers": [    "custom_components.esphome_designer"  ],  "requirements": [],  "version": "1.0.0-rc.41"}
+{
+  "domain": "esphome_designer",
+  "name": "ESPHome Designer",
+  "after_dependencies": [
+    "http",
+    "frontend",
+    "panel_custom",
+    "recorder"
+  ],
+  "codeowners": [
+    "@koosoli"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/koosoli/ESPHomeDesigner",
+  "integration_type": "hub",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/koosoli/ESPHomeDesigner/issues",
+  "loggers": [
+    "custom_components.esphome_designer"
+  ],
+  "requirements": [],
+  "version": "1.0.0-rc.42"
+}
