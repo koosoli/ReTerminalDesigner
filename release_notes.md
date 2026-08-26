@@ -4,6 +4,11 @@
 ### Features
 - **M5Stack PaperMono Profile (Untested):** Added a hardware profile for the new M5Stack PaperMono (C153) e-ink terminal: SSD1677 3.97" 480x800 panel via `epaper_spi`, FT6336 touch on GPIO4, KEY1/KEY2 page buttons, octal PSRAM, and the M5IOE1 expander handling display reset and power rail through M5Stack's external component. Battery level, frontlight dimming, and deep sleep are not wired yet because they run through the M5PM1 PMIC, which has no ESPHome component at this time. The profile is flagged untested - the device launched only days ago and no community ESPHome config exists yet; feedback from owners is very welcome.
 
+### Fixes
+- **Graph Background Fill Typo (PR #495, thanks @ysrgrathe):** The direct-mode graph export emitted `fill_rectangle()`, which does not exist in ESPHome's drawing API, so any graph with a background color produced uncompilable YAML. It now correctly emits `filled_rectangle()`.
+- **Weather Icon Local Sensor Option (PR #491, thanks @SoundGoof):** The Weather Icon widget gained the same "Local / On-Device Sensor" checkbox that Sensor Text already has. When enabled, no `platform: homeassistant` text sensor is exported and the display lambda references the on-device entity directly - enabling setups where another controller pushes state over the ESPHome native API.
+- **Lock Entities in Entity Picker (Issue #468):** The entity suggestion filter did not include the `lock.` domain, so locks never appeared when typing in the widget property panel even though manual entry worked. Lock entities are now offered everywhere entities are picked.
+
 ---
 
 ## v1.0.0 RC41 - Home Assistant Action Syntax

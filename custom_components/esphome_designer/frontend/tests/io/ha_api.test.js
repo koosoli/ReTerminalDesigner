@@ -406,6 +406,11 @@ describe('ha_api', () => {
                 attributes: { friendly_name: 'Kitchen Light' }
             },
             {
+                entity_id: 'lock.front_door',
+                state: 'locked',
+                attributes: { friendly_name: 'Front Door' }
+            },
+            {
                 entity_id: 'camera.front_door',
                 state: 'idle',
                 attributes: { friendly_name: 'Front Door' }
@@ -425,6 +430,8 @@ describe('ha_api', () => {
         expect(fetchMock).toHaveBeenCalledTimes(2);
         expect(entities.map(e => e.entity_id)).toContain('sensor.temp');
         expect(entities.map(e => e.entity_id)).toContain('light.kitchen');
+        // Issue #468: lock entities must appear in the picker suggestions
+        expect(entities.map(e => e.entity_id)).toContain('lock.front_door');
         expect(entities.map(e => e.entity_id)).not.toContain('camera.front_door');
     });
 
