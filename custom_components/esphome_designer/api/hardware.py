@@ -225,7 +225,7 @@ class ReTerminalHardwareListView(DesignerBaseView):
                     pass
 
                 # Detect touchscreen support so touch_area / nav widgets can export
-                touchscreen = (data or {}).get("touchscreen")
+                touchscreen = (data if isinstance(data, dict) else {}).get("touchscreen")
                 if isinstance(touchscreen, list) and touchscreen:
                     touchscreen = touchscreen[0]
                 if isinstance(touchscreen, dict):
