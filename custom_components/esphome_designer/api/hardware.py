@@ -264,7 +264,7 @@ class ReTerminalHardwareListView(DesignerBaseView):
                 else:
                     hw_package = f"hardware/{yaml_file.name}"
 
-                templates.append({
+                template: dict[str, Any] = {
                     "id": clean_id,
                     "name": name,
                     "isPackageBased": True,
@@ -274,9 +274,15 @@ class ReTerminalHardwareListView(DesignerBaseView):
                     "shape": shape,
                     "chip": chip,
                     "board": board,
-                    "touch": touch,
                     "features": features
-                })
+                }
+                # Only sent when a touchscreen was detected. mergeDeviceProfile
+                # spreads this template over the static profile, so a null here
+                # would erase a built-in profile's hand-written touch block.
+                if touch:
+                    template["touch"] = touch
+
+                templates.append(template)
                 _LOGGER.debug("Loaded profile '%s' from %s", clean_id, yaml_file)
 
             except Exception as e:  # noqa: BLE001
