@@ -142,6 +142,7 @@ export function buildBasicWidgetProps(widgetType, p, widget) {
     if (widgetType === "ondevice_temperature") {
         return {
             size: parseInt(p.size || 32, 10),
+            ...(p.font_family ? { font_family: p.font_family } : {}),
             font_size: parseInt(p.font_size || 16, 10),
             label_font_size: parseInt(p.label_font_size || 10, 10),
             color: p.color || "black",
@@ -156,6 +157,7 @@ export function buildBasicWidgetProps(widgetType, p, widget) {
     if (widgetType === "ondevice_humidity") {
         return {
             size: parseInt(p.size || 32, 10),
+            ...(p.font_family ? { font_family: p.font_family } : {}),
             font_size: parseInt(p.font_size || 16, 10),
             label_font_size: parseInt(p.label_font_size || 10, 10),
             color: p.color || "black",
