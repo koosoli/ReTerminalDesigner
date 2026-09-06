@@ -114,6 +114,7 @@ class ReTerminalHardwareListView(DesignerBaseView):
                 height = 480
                 shape = "rect"
                 features: dict[str, Any] = {"psram": True, "lcd": True}
+                touch: dict[str, Any] | None = None
 
                 # Parse metadata from comments
                 name_match = re.search(r"#\s*Name:\s*(.*)", content, re.IGNORECASE)
@@ -194,6 +195,7 @@ class ReTerminalHardwareListView(DesignerBaseView):
                 else:
                     features["lvgl"] = True
 
+                data = None
                 try:
                     data = yaml.safe_load(content)
                     if data and "display" in data:
@@ -222,6 +224,29 @@ class ReTerminalHardwareListView(DesignerBaseView):
                 except Exception:  # noqa: BLE001
                     pass
 
+                # Detect touchscreen support so touch_area / nav widgets can export
+                touchscreen = (data if isinstance(data, dict) else {}).get("touchscreen")
+                if isinstance(touchscreen, list) and touchscreen:
+                    touchscreen = touchscreen[0]
+                if isinstance(touchscreen, dict):
+                    touch_cfg = {
+                        key: touchscreen[key]
+                        for key in (
+                            "platform",
+                            "id",
+                            "i2c_id",
+                            "address",
+                            "interrupt_pin",
+                            "reset_pin",
+                            "transform",
+                            "calibration",
+                        )
+                        if key in touchscreen
+                    }
+                    if touch_cfg:
+                        features["touch"] = True
+                        touch = touch_cfg
+
                 clean_id = yaml_file.stem.replace("-", "_").replace(".", "_")
 
                 # Custom profiles get a prefix to avoid ID collisions with built-in
@@ -239,7 +264,7 @@ class ReTerminalHardwareListView(DesignerBaseView):
                 else:
                     hw_package = f"hardware/{yaml_file.name}"
 
-                templates.append({
+                template: dict[str, Any] = {
                     "id": clean_id,
                     "name": name,
                     "isPackageBased": True,
@@ -250,7 +275,14 @@ class ReTerminalHardwareListView(DesignerBaseView):
                     "chip": chip,
                     "board": board,
                     "features": features
-                })
+                }
+                # Only sent when a touchscreen was detected. mergeDeviceProfile
+                # spreads this template over the static profile, so a null here
+                # would erase a built-in profile's hand-written touch block.
+                if touch:
+                    template["touch"] = touch
+
+                templates.append(template)
                 _LOGGER.debug("Loaded profile '%s' from %s", clean_id, yaml_file)
 
             except Exception as e:  # noqa: BLE001
