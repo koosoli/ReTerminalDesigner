@@ -9,6 +9,7 @@ import { AppState } from '../../js/core/state';
  *     color?: string,
  *     size?: number,
  *     font_size?: number,
+ *     font_family?: string,
  *     label_font_size?: number,
  *     unit?: string,
  *     show_label?: boolean,
@@ -23,6 +24,7 @@ import { AppState } from '../../js/core/state';
 export const renderOnDeviceTemperature = (el, widget, { getColorStyle }) => {
     const props = widget.props || {};
     const color = props.color || "black";
+    const fontFamily = (props.font_family || "Roboto") + ", sans-serif";
     let iconSize = props.size || 32;
     let fontSize = props.font_size || 16;
     let labelFontSize = props.label_font_size || 12;
@@ -84,6 +86,7 @@ export const renderOnDeviceTemperature = (el, widget, { getColorStyle }) => {
     el.appendChild(iconEl);
 
     const valueEl = document.createElement("div");
+    valueEl.style.fontFamily = fontFamily;
     valueEl.style.fontSize = `${fontSize}px`;
     valueEl.style.fontWeight = "500";
     valueEl.style.marginTop = "2px";
@@ -98,6 +101,7 @@ export const renderOnDeviceTemperature = (el, widget, { getColorStyle }) => {
 
     if (showLabel) {
         const labelEl = document.createElement("div");
+        labelEl.style.fontFamily = fontFamily;
         labelEl.style.fontSize = `${labelFontSize}px`;
         labelEl.style.opacity = "0.7";
         labelEl.style.marginTop = "1px";

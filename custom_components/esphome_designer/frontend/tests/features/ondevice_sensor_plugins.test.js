@@ -17,6 +17,9 @@ import { renderOnDeviceTemperature } from '../../features/ondevice_temperature/r
 import { renderOnDeviceHumidity } from '../../features/ondevice_humidity/render.js';
 import temperaturePlugin from '../../features/ondevice_temperature/plugin.js';
 import humidityPlugin from '../../features/ondevice_humidity/plugin.js';
+import { FontRegistry } from '../../js/io/adapters/font_registry.js';
+import { buildBasicWidgetProps } from '../../js/io/yaml_parsers/widget_props_map_basic.js';
+import { load } from 'js-yaml';
 
 describe('ondevice sensor plugins', () => {
     const fahrenheitUnit = temperaturePlugin.schema
@@ -308,5 +311,74 @@ describe('ondevice sensor plugins', () => {
             '- lvgl.widget.refresh: hum_ext_icon',
             '- lvgl.widget.refresh: hum_ext_text'
         ]);
+    });
+});
+
+describe.each([
+    [temperaturePlugin, renderOnDeviceTemperature],
+    [humidityPlugin, renderOnDeviceHumidity]
+])('ondevice sensor font selection: $0.id', (plugin, render) => {
+    it.each(['sensor.external', ''])('uses the selected family for value and label, including sensor fallback (%s)', (entityId) => {
+        const widget = {
+            id: 'font_sensor', type: plugin.id, x: 0, y: 0, width: 80, height: 60,
+            entity_id: entityId,
+            props: { font_family: 'Inter', size: 24, font_size: 16, label_font_size: 10, show_label: true, is_local_sensor: false }
+        };
+        const registry = new FontRegistry();
+        const addFont = registry.addFont.bind(registry);
+        plugin.collectRequirements(widget, { addFont, trackIcon: registry.trackIcon.bind(registry) });
+        const lines = [];
+        plugin.export(widget, {
+            lines, addFont, profile: { features: {} },
+            getColorConst: (value) => value,
+            getConditionCheck: () => null
+        });
+        expect(lines.join('\n')).toContain('id(font_inter_400_16)');
+        expect(lines.join('\n')).toContain('id(font_inter_400_10)');
+        expect(lines.join('\n')).toContain('id(font_material_design_icons_400_24)');
+        expect(lines.join('\n')).not.toContain('font_roboto');
+
+        const lvgl = plugin.exportLVGL(widget, {
+            common: {}, profile: { features: {} }, convertColor: (value) => value,
+            getLVGLFont: (family, size, weight) => addFont(family, weight, size)
+        });
+        expect(lvgl.obj.widgets[0].label.text_font).toBe('font_material_design_icons_400_24');
+        expect(lvgl.obj.widgets[1].label.text_font).toBe('font_inter_400_16');
+        expect(lvgl.obj.widgets[2].label.text_font).toBe('font_inter_400_10');
+
+        const yaml = load(registry.getLines().join('\n'));
+        const textFonts = yaml.font.filter((font) => typeof font.file === 'object');
+        expect(textFonts.map((font) => font.file.family)).toEqual(['Inter', 'Inter']);
+    });
+
+    it('renders the chosen family on text while preserving the icon font', () => {
+        const el = document.createElement('div');
+        render(el, { height: 60, props: { font_family: 'Open Sans', show_label: true } }, {
+            getColorStyle: (value) => value
+        });
+        expect(el.children[0].style.fontFamily).toContain('MDI');
+        expect(el.children[1].style.fontFamily).toContain('Open Sans');
+        expect(el.children[2].style.fontFamily).toBe(el.children[1].style.fontFamily);
+    });
+
+    it('retains the selected family when importing widget metadata', () => {
+        const imported = buildBasicWidgetProps(plugin.id, { font_family: 'Open Sans' }, {});
+        expect(imported.font_family).toBe('Open Sans');
+        const el = document.createElement('div');
+        render(el, { height: 60, props: imported }, { getColorStyle: (value) => value });
+        expect(el.children[1].style.fontFamily).toContain('Open Sans');
+    });
+
+    it('keeps Roboto for layouts without a font-family property', () => {
+        const widget = { id: 'legacy', props: { show_label: true, is_local_sensor: false } };
+        const lvgl = plugin.exportLVGL(widget, {
+            common: {}, profile: { features: {} }, convertColor: (value) => value,
+            getLVGLFont: (family, size, weight) => `${family}_${size}_${weight}`
+        });
+        expect(lvgl.obj.widgets[1].label.text_font).toBe('Roboto_16_400');
+        expect(lvgl.obj.widgets[2].label.text_font).toBe('Roboto_10_400');
+        const el = document.createElement('div');
+        render(el, widget, { getColorStyle: (value) => value });
+        expect(el.children[1].style.fontFamily).toContain('Roboto');
     });
 });

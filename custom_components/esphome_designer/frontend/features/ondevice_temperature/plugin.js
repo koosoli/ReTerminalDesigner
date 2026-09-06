@@ -16,6 +16,7 @@ export default {
         width: 60,
         height: 60,
         size: 32,
+        font_family: "Roboto",
         font_size: 16,
         label_font_size: 10,
         color: "black",
@@ -56,6 +57,7 @@ export default {
         {
             section: "Appearance",
             fields: [
+                { key: "font_family", label: "Font Family (Direct/LVGL)", type: "select", options: ["Roboto", "Inter", "Open Sans", "Lato", "Montserrat", "Poppins", "Raleway", "Roboto Mono", "Ubuntu", "Nunito", "Playfair Display", "Merriweather", "Work Sans", "Source Sans Pro", "Quicksand"], default: "Roboto" },
                 { key: "color", label: "Main Color", type: "color", default: "black" },
                 { key: "opa", label: "Opacity (0 - 255)", type: "number", default: 255 },
                 { key: "opacity", label: "Opacity (0 - 255)", type: "number", default: 255 }
@@ -182,7 +184,7 @@ export default {
                                 align: "top_mid",
                                 y: parseInt(p.size || 32, 10) + 2,
                                 text: `--${p.unit || "°C"}`, // Static text
-                                text_font: getLVGLFont("Roboto", parseInt(p.font_size || 16, 10), 400),
+                                text_font: getLVGLFont(p.font_family || "Roboto", parseInt(p.font_size || 16, 10), 400),
                                 text_color: convertColor(p.color || "black"),
                                 text_align: "center"
                             }
@@ -193,7 +195,7 @@ export default {
                                 height: parseInt(p.label_font_size || 10, 10) + 4,
                                 align: "bottom_mid",
                                 text: `"Temperature"`,
-                                text_font: getLVGLFont("Roboto", parseInt(p.label_font_size || 10, 10), 400),
+                                text_font: getLVGLFont(p.font_family || "Roboto", parseInt(p.label_font_size || 10, 10), 400),
                                 text_color: convertColor(p.color || "black"),
                                 text_align: "center",
                                 opa: "70%"
@@ -246,7 +248,7 @@ export default {
                     align: "top_mid",
                     y: iconSize + 2,
                     text: textLambda,
-                    text_font: getLVGLFont("Roboto", fontSize, 400),
+                    text_font: getLVGLFont(p.font_family || "Roboto", fontSize, 400),
                     text_color: color,
                     text_align: "center"
                 }
@@ -260,7 +262,7 @@ export default {
                     height: labelSize + 4,
                     align: "bottom_mid",
                     text: `"Temperature"`,
-                    text_font: getLVGLFont("Roboto", labelSize, 400),
+                    text_font: getLVGLFont(p.font_family || "Roboto", labelSize, 400),
                     text_color: color,
                     text_align: "center",
                     opa: "70%"
@@ -285,8 +287,8 @@ export default {
         const labelSize = parseInt(p.label_font_size || 10, 10);
 
         addFont("Material Design Icons", 400, iconSize);
-        addFont("Roboto", 400, fontSize);
-        if (p.show_label) addFont("Roboto", 400, labelSize);
+        addFont(p.font_family || "Roboto", 400, fontSize);
+        if (p.show_label) addFont(p.font_family || "Roboto", 400, labelSize);
 
         ["F0E4C", "F050F", "F10C2"].forEach(c => trackIcon(c, iconSize));
     },
@@ -301,7 +303,7 @@ export default {
         const iconSize = p.size || 32;
         const fontSize = p.font_size || 16;
         const iconFontId = addFont("Material Design Icons", 400, iconSize);
-        const valueFontId = addFont("Roboto", 400, fontSize);
+        const valueFontId = addFont(p.font_family || "Roboto", 400, fontSize);
 
         const isLocal = p.is_local_sensor === true || (p.is_local_sensor !== false && !w.entity_id);
         let sensorId = (w.entity_id || "").replace(/[^a-zA-Z0-9_]/g, "_");
@@ -363,7 +365,7 @@ export default {
         }
 
         if (p.show_label) {
-            const labelFontId = addFont("Roboto", 400, labelSize);
+            const labelFontId = addFont(p.font_family || "Roboto", 400, labelSize);
             lines.push(`        it.printf(${centerX}, ${labelTopY}, id(${labelFontId}), ${color}, TextAlign::TOP_CENTER, "Temperature");`);
         }
 
